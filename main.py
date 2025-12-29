@@ -38,6 +38,27 @@ usd_change, percent_change = get_price_changes(current_price, close_prices, days
 
 volatility_flt, volatility_percent = get_volatility(close_prices, days_in_period[period])
 
-print(f'{ticker} {days_in_period[period]}-Day Volatility: {volatility_percent}%')
+fifty_MA, fifty_MAs_list = get_MAs(close_prices, days_in_period[period], 50)
+two_hundred_MA, two_hundred_MAs_list = get_MAs(close_prices, days_in_period[period], 200)
+
+
+
+#---------------------------------------------------------------------------------------
+# variable.             type        description
+# ticker                str         stock ticker
+# period                str         user picked timeframe e.g. 1mo
+# days_in_period        dict        key value pair of days in each period e.g. 1mo:30
+# current_price         flt         current stock market value
+# open_prices           df_col      historical open prices of stock
+# close_prices          df_col      historical close prices of stock
+# volumes               df_col      historical volumes of the stock
+# usd_change            flt         price changes of the stock from period begin to now
+# percent_change        pct         percentage changes of the stock prices from begin to now
+# volatility_flt        flt         n-day volatility of the stock price
+# volatility_flt        pct         n-day volatility of the stock price in percentage
+# fifty_MA              flt         current 50-Day MA
+# fifty_MAs_list        list        list of 50-day MAs of the last days in period
+# two_hundred_MA        flt         current 200-Day MA
+# two_hundred_MAs_list  list        list of 200-day MAs of the last days in period
 
 

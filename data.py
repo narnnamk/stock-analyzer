@@ -40,7 +40,3 @@ def get_history_data(ticker):
     stock = yf.Ticker(ticker)
     stock_history = stock.history(period='max')
     return stock.info['regularMarketPrice'], stock_history['Open'], stock_history['Close'], stock_history['Volume']
-
-
-
-
