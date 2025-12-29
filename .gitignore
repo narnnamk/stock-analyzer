@@ -2,4 +2,8 @@
 __pycache__/
 *.pyc
 tester.py
-
+__pycache__
+__pycache__/analysis.cpython-314.pyc
+__pycache__/data.cpython-314.pyc
+__pycache__/indicators.cpython-314.pyc
+__pycache__/plots.cpython-314.pyc
