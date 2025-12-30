@@ -9,6 +9,7 @@ print('-' * 67)
 print("This program provides a comprehensive analysis of a stock.")
 print("You can explore the stock's volatility, volume, and moving averages,")
 print("view visual graphs, and receive a summary recommendation at the end.")
+print("Disclaimer: selected period only consist of trading days.")
 print('-' * 67)
 print('-' * 67)
 
@@ -32,7 +33,7 @@ while period not in valid_period or not has_enough_data:
 
 days_in_period = {'5d':5, '1mo':30, '3mo':90, '6mo':180, '1y':365}
 
-current_price, open_prices, close_prices, volumes = get_history_data(ticker)
+current_price, open_prices, high_prices, low_prices, close_prices, volumes = get_history_data(ticker)
 
 usd_change, percent_change = get_price_changes(current_price, close_prices, days_in_period[period])
 
@@ -41,7 +42,13 @@ volatility_flt, volatility_percent = get_volatility(close_prices, days_in_period
 fifty_MA, fifty_MAs_list = get_MAs(close_prices, days_in_period[period], 50)
 two_hundred_MA, two_hundred_MAs_list = get_MAs(close_prices, days_in_period[period], 200)
 
+current_OBV, OBVs_list = get_OBVs(close_prices, volumes, days_in_period[period])
 
+period_high, period_low = get_period_high_lows(high_prices, low_prices, days_in_period[period])
+
+expert_comments = get_recommendations(ticker)
+
+print(expert_comments)
 
 #---------------------------------------------------------------------------------------
 # variable.             type        description
@@ -57,8 +64,14 @@ two_hundred_MA, two_hundred_MAs_list = get_MAs(close_prices, days_in_period[peri
 # volatility_flt        flt         n-day volatility of the stock price
 # volatility_flt        pct         n-day volatility of the stock price in percentage
 # fifty_MA              flt         current 50-Day MA
-# fifty_MAs_list        list        list of 50-day MAs of the last days in period
+# fifty_MAs_list        list        list of 50-day MAs of the days in period
 # two_hundred_MA        flt         current 200-Day MA
-# two_hundred_MAs_list  list        list of 200-day MAs of the last days in period
+# two_hundred_MAs_list  list        list of 200-day MAs of the days in period
+# current_OBV           int         current on balance volume
+# OBVs_list             list        list of on balance volume of the days in period
+# period_high           flt         highest stock price from the period
+# period_low            flt         lowest stock price from the period
+# expert_comments       dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
+
 
 

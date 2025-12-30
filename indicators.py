@@ -1,42 +1,27 @@
 import pandas as pd
 import numpy as np
 
-def get_price_changes(current_price, close_prices, days):
+def get_price_changes(current, closes, days):
     #closing price at the beginning of the period
-    start_price = close_prices.tail(days).iloc[0]
+    start = closes.tail(days).iloc[0]
 
-    usd_change = current_price - start_price
-    percent_change = (usd_change/start_price) * 100
+    usd_change = current - start
+    percent_change = (usd_change/start) * 100
 
     return round(usd_change, 2), round(percent_change, 2)
 
 
-def get_volatility(close_prices, days):
-    prices = close_prices.tail(days)
+def get_volatility(closes, days):
+    prices = closes.tail(days)
     log_returns = np.log(prices / prices.shift(1))
     v_flt = log_returns.std()
     v_pct = v_flt * 100
     return v_flt, round(v_pct, 2)
 
 
-# def get_moving_averages(close_prices, days, window):
-#     moving_averages = []
-    
-#     for i in range(days):
-#         if i == 0:
-#             moving_avg = close_prices.iloc[-window:].mean()
-#         else:
-#             moving_avg = close_prices.iloc[-(i+window):-i].mean()
-#         moving_averages.append(round(moving_avg,2))
-    
-#     moving_averages.reverse()
-
-#     return moving_averages[0], moving_averages
-
-
-def get_MAs(close_prices, days, window):
+def get_MAs(closes, days, window):
     moving_averages = (
-        close_prices
+        closes
         .rolling(window=window)
         .mean()
         .dropna()
@@ -47,4 +32,24 @@ def get_MAs(close_prices, days, window):
     return moving_averages[-1], moving_averages
 
 
-def get_OBV():
+def get_OBVs(closes, volumes, days):
+    prices = closes.tail(days)
+    volumes = volumes.tail(days)
+
+    OBVs = [0]
+
+    for i in range(1, days):
+        if prices.iloc[i] > prices.iloc[i-1]:
+            OBVs.append(OBVs[-1] + volumes.iloc[i])
+        elif prices.iloc[i] < prices.iloc[i-1]:
+            OBVs.append(OBVs[-1] - volumes.iloc[i])
+        else:
+            OBVs.append(OBVs[-1])
+    
+    return OBVs[-1], OBVs
+
+
+def get_period_high_lows(highs, lows, days):
+    highs = highs.tail(days)
+    lows = lows.tail(days)
+    return round(highs.max(),2), round(lows.min(),2)    
