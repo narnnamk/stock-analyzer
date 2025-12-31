@@ -3,54 +3,102 @@ from indicators import *
 from plots import *
 from analysis import *
 
-print('-' * 67)
-print('Welcome to Stock Analyzer!')
-print('-' * 67)
+
+print("-" * 67)
+print("Welcome to Stock Analyzer!")
+print("-" * 67)
 print("This program provides a comprehensive analysis of a stock.")
 print("You can explore the stock's volatility, volume, and moving averages,")
 print("view visual graphs, and receive a summary recommendation at the end.")
 print("Disclaimer: selected period only consist of trading days.")
-print('-' * 67)
-print('-' * 67)
+print("-" * 67)
+print("-" * 67)
 
-ticker = str(input('Enter stock ticker: ').strip().replace(' ', '').upper())
-while not is_valid_ticker(ticker):
-    ticker = str(input('Enter the stock ticker: ').strip().replace(' ', '').upper())
+ticker = str(input("Enter stock ticker: ").strip().replace(" ", "").upper())
+run_loop = True
 
-valid_period = ['5d','1mo','3mo','6mo','1y']
-period = str(input(f'{valid_period}\nEnter time period: ').strip().replace(' ', '').lower())
-has_enough_data = period_covers_history(period, ticker)
+
+while run_loop:
+    while not is_valid_ticker(ticker):
+        print("-" * 67)
+        ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
+    has_enough_data = period_covers_history("5d", ticker)
+    while not has_enough_data:
+        print(
+            f"{ticker} does not have enough historical data to perform trend analysis.\n"
+            "Specifically, the 200-day moving average, a significant indicator, cannot be calculated."
+        )
+        print("-" * 67)
+        ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
+        has_enough_data = period_covers_history("5d", ticker)
+    run_loop = False
+
+
+valid_period = ["5d", "1mo", "3mo", "6mo", "1y"]
+print("-" * 67)
+period = str(
+    input(f"{valid_period}\nEnter time period for {ticker}: ")
+    .strip()
+    .replace(" ", "")
+    .lower()
+)
+
 
 while period not in valid_period or not has_enough_data:
-    if period not in valid_period:
-        print('Invalid time period. Please choose from the available options.')
-    if not has_enough_data:
-        print(f'{ticker} is relatively new. Please select a shorter time period.')
-
-    period = str(input(f'{valid_period}\nEnter time period: ').strip().replace(' ', '').lower())
+    while period not in valid_period:
+        print("Invalid time period. Please choose from the available options.")
+        print("-" * 67)
+        period = str(
+            input(f"{valid_period}\nEnter time period for {ticker}: ")
+            .strip()
+            .replace(" ", "")
+            .lower()
+        )
     has_enough_data = period_covers_history(period, ticker)
+    while not has_enough_data:
+        print(f"{ticker} is relatively new. Please select a shorter time period.")
+        print("-" * 67)
+        period = str(
+            input(f"{valid_period}\nEnter time period for {ticker}: ")
+            .strip()
+            .replace(" ", "")
+            .lower()
+        )
+        has_enough_data = period_covers_history(period, ticker)
+print("-" * 67)
 
 
-days_in_period = {'5d':5, '1mo':30, '3mo':90, '6mo':180, '1y':365}
+days_in_period = {"5d": 5, "1mo": 30, "3mo": 90, "6mo": 180, "1y": 365}
 
-current_price, open_prices, high_prices, low_prices, close_prices, volumes = get_history_data(ticker)
+current_price, open_prices, high_prices, low_prices, close_prices, volumes = (
+    get_history_data(ticker)
+)
 
-usd_change, percent_change = get_price_changes(current_price, close_prices, days_in_period[period])
+usd_change, percent_change = get_price_changes(
+    current_price, close_prices, days_in_period[period]
+)
 
-volatility_flt, volatility_percent = get_volatility(close_prices, days_in_period[period])
+volatility_flt, volatility_percent = get_volatility(
+    close_prices, days_in_period[period]
+)
 
 fifty_MA, fifty_MAs_list = get_MAs(close_prices, days_in_period[period], 50)
-two_hundred_MA, two_hundred_MAs_list = get_MAs(close_prices, days_in_period[period], 200)
+two_hundred_MA, two_hundred_MAs_list = get_MAs(
+    close_prices, days_in_period[period], 200
+)
 
 current_OBV, OBVs_list = get_OBVs(close_prices, volumes, days_in_period[period])
 
-period_high, period_low = get_period_high_lows(high_prices, low_prices, days_in_period[period])
+period_high, period_low = get_period_high_lows(
+    high_prices, low_prices, days_in_period[period]
+)
 
 expert_comments = get_recommendations(ticker)
 
-print(expert_comments)
+print("yay")
 
-#---------------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------------
 # variable.             type        description
 # ticker                str         stock ticker
 # period                str         user picked timeframe e.g. 1mo
@@ -72,6 +120,3 @@ print(expert_comments)
 # period_high           flt         highest stock price from the period
 # period_low            flt         lowest stock price from the period
 # expert_comments       dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
-
-
-
