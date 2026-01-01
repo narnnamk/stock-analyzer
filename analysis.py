@@ -58,6 +58,94 @@ def get_trend_message(trend, ticker):
     return message[trend]
 
 
+def analyze_momentum(percent_change, price, high, low, period):
+    percent_thresholds = {
+        "1mo": [8, 3, -3, -8],
+        "3mo": [15, 6, -6, -15],
+        "6mo": [20, 8, -8, -20],
+        "1y": [30, 12, -12, -30],
+    }
+    period_percent_threshold = percent_thresholds[period]
+
+    if high == low:
+        return "no_movement"
+
+    range_position = round((price - low) / (high - low), 2)
+    range_position_threshold = [0.8, 0.6, 0.4, 0.2]
+
+    pc = percent_change
+    pc_th = period_percent_threshold
+    rp = range_position
+    rp_th = range_position_threshold
+
+    if (pc >= pc_th[0]) and (rp >= rp_th[0]):
+        return "strong_buy_momentum"
+    elif (pc <= pc_th[3]) and (rp <= rp_th[3]):
+        return "strong_sell_momentum"
+    elif (pc > 0) and (rp <= 0.3):
+        return "bounce_attempt"
+    elif (pc_th[1] <= pc < pc_th[0]) and (rp >= rp_th[1]):
+        return "moderate_buy_momentum"
+    elif (pc_th[2] <= pc <= pc_th[1]) and (rp_th[2] <= rp <= rp_th[1]):
+        return "consolidation"
+    elif (pc_th[3] < pc <= pc_th[2]) and (rp <= rp_th[2]):
+        return "weak_sell_momentum"
+    else:
+        return "mixed_signal"
+
+
+def get_momentum_message(momentum, ticker):
+    messages = {
+        "strong_buy_momentum": (
+            f"{ticker} shows strong bullish momentum.\n"
+            "Price is near the period high with a large positive gain, suggesting aggressive buying pressure."
+        ),
+        "moderate_buy_momentum": (
+            f"{ticker} shows moderate bullish momentum.\n"
+            "Price is trending higher with decent gains and positioned above the midpoint, "
+            "suggesting sustained buying interest without overheating."
+        ),
+        "bounce_attempt": (
+            f"{ticker} may be attempting a bounce from recent lows.\n"
+            "Price shows positive change despite being in the lower range, "
+            "but this is an early signal requiring confirmation from follow-through."
+        ),
+        "consolidation": (
+            f"{ticker} is consolidating.\n"
+            "Price movement is minimal with trading near the middle of its recent range, "
+            "suggesting equilibrium between buyers and sellers."
+        ),
+        "weak_sell_momentum": (
+            f"{ticker} shows weak bearish momentum.\n"
+            "Price is drifting lower and positioned below the midpoint, "
+            "indicating mild selling pressure without panic."
+        ),
+        "strong_sell_momentum": (
+            f"{ticker} shows strong bearish momentum.\n"
+            "Price is near the period low with a large negative change, indicating heavy selling pressure."
+        ),
+        "mixed_signal": (
+            f"{ticker} shows mixed momentum signals.\n"
+            "Price position and percentage change are not aligned, "
+            "suggesting uncertainty or transition between trends."
+        ),
+        "no_movement": (
+            f"{ticker} traded flat during this period with no significant price range."
+        ),
+    }
+    return messages[momentum]
+
+
+# Momentum scenarios
+# strong buying momentum = (pc >= pc_th[0]) and (rp >= 0.8) /
+# moderate buying momentum = (pc_th[1] <= pc < pc_th[0]) and (rp >= 0.6) /
+# consolidation/range-bound = (pc_th[2] < pc < pc_th[1]) and (0.4 <= rp <= 0.6) /
+# weak selling pressure = (pc_th[3] < pc <= pc_th[2]) and (rp <= 0.4) /
+# strong selling momentum = (pc <= pc_th[3]) and (rp <= 0.2) /
+# bounce attempt = (pc > 0) and (rp <= 0.3) /
+# mixed signal if else
+
+# Trend scenarios
 # Strong bullish: price > 50 > 200
 # Weak bullish: 50 > price > 200
 # Transitional: 200 > price > 50

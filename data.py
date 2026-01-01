@@ -15,7 +15,7 @@ def period_covers_history(period, ticker):
     # Days_needed:
     # Count only trading days
     # Added 200 days buffer to allow 200-days MA calculation
-    days_needed = {"1y": 565, "6mo": 380, "3mo": 290, "1mo": 230}
+    days_needed = {"1y": 452, "6mo": 326, "3mo": 263, "1mo": 221}
     stock = yf.Ticker(ticker)
     stock_history = stock.history(period="max")
 

@@ -70,7 +70,7 @@ while loop_period_input:
 print("-" * 67)
 
 
-days_in_period = {"5d": 5, "1mo": 30, "3mo": 90, "6mo": 180, "1y": 365}
+days_in_period = {"1mo": 21, "3mo": 63, "6mo": 126, "1y": 252}
 
 current_price, open_prices, high_prices, low_prices, close_prices, volumes = (
     get_history_data(ticker)
@@ -98,7 +98,14 @@ expert_comments = get_recommendations(ticker)
 trend = analyze_trend(current_price, fifty_MA, two_hundred_MA)
 trend_message = get_trend_message(trend, ticker)
 
+momentum = analyze_momentum(
+    percent_change, current_price, period_high, period_low, period
+)
+momentum_message = get_momentum_message(momentum, ticker)
+
+
 print(trend_message)
+print(momentum_message)
 print("yay")
 
 
