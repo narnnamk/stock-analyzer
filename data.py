@@ -15,11 +15,11 @@ def period_covers_history(period, ticker):
     # Days_needed:
     # Count only trading days
     # Added 200 days buffer to allow 200-days MA calculation
-    days_needed = {"1y": 565, "6mo": 380, "3mo": 290, "1mo": 230, "5d": 205}
+    days_needed = {"1y": 565, "6mo": 380, "3mo": 290, "1mo": 230}
     stock = yf.Ticker(ticker)
     stock_history = stock.history(period="max")
 
-    if stock_history.shape[0] < days_needed["5d"]:
+    if stock_history.shape[0] < days_needed["1mo"]:
         return False
 
     if stock_history.shape[0] < days_needed[period]:
@@ -31,7 +31,7 @@ def get_history_data(ticker):
     stock = yf.Ticker(ticker)
     stock_history = stock.history(period="max")
     return (
-        stock.info["regularMarketPrice"],
+        round(stock.info["regularMarketPrice"], 2),
         stock_history["Open"],
         stock_history["High"],
         stock_history["Low"],

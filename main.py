@@ -10,19 +10,19 @@ print("-" * 67)
 print("This program provides a comprehensive analysis of a stock.")
 print("You can explore the stock's volatility, volume, and moving averages,")
 print("view visual graphs, and receive a summary recommendation at the end.")
-print("Disclaimer: selected period only consist of trading days.")
+print("Note: Time periods use trading days only.")
 print("-" * 67)
 print("-" * 67)
 
-ticker = str(input("Enter stock ticker: ").strip().replace(" ", "").upper())
-run_loop = True
+ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
+loop_ticker_input = True
 
 
-while run_loop:
+while loop_ticker_input:
     while not is_valid_ticker(ticker):
         print("-" * 67)
         ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
-    has_enough_data = period_covers_history("5d", ticker)
+    has_enough_data = period_covers_history("1mo", ticker)
     while not has_enough_data:
         print(
             f"{ticker} does not have enough historical data to perform trend analysis.\n"
@@ -30,11 +30,11 @@ while run_loop:
         )
         print("-" * 67)
         ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
-        has_enough_data = period_covers_history("5d", ticker)
-    run_loop = False
+        has_enough_data = period_covers_history("1mo", ticker)
+    loop_ticker_input = False
 
 
-valid_period = ["5d", "1mo", "3mo", "6mo", "1y"]
+valid_period = ["1mo", "3mo", "6mo", "1y"]
 print("-" * 67)
 period = str(
     input(f"{valid_period}\nEnter time period for {ticker}: ")
@@ -42,9 +42,10 @@ period = str(
     .replace(" ", "")
     .lower()
 )
+loop_period_input = True
 
 
-while period not in valid_period or not has_enough_data:
+while loop_period_input:
     while period not in valid_period:
         print("Invalid time period. Please choose from the available options.")
         print("-" * 67)
@@ -65,6 +66,7 @@ while period not in valid_period or not has_enough_data:
             .lower()
         )
         has_enough_data = period_covers_history(period, ticker)
+    loop_period_input = False
 print("-" * 67)
 
 
@@ -78,9 +80,7 @@ usd_change, percent_change = get_price_changes(
     current_price, close_prices, days_in_period[period]
 )
 
-volatility_flt, volatility_percent = get_volatility(
-    close_prices, days_in_period[period]
-)
+volatility_flt, volatility_pct = get_volatility(close_prices, days_in_period[period])
 
 fifty_MA, fifty_MAs_list = get_MAs(close_prices, days_in_period[period], 50)
 two_hundred_MA, two_hundred_MAs_list = get_MAs(
@@ -95,6 +95,10 @@ period_high, period_low = get_period_high_lows(
 
 expert_comments = get_recommendations(ticker)
 
+trend = analyze_trend(current_price, fifty_MA, two_hundred_MA)
+trend_message = get_trend_message(trend, ticker)
+
+print(trend_message)
 print("yay")
 
 
@@ -110,7 +114,7 @@ print("yay")
 # usd_change            flt         price changes of the stock from period begin to now
 # percent_change        pct         percentage changes of the stock prices from begin to now
 # volatility_flt        flt         n-day volatility of the stock price
-# volatility_flt        pct         n-day volatility of the stock price in percentage
+# volatility_pct    pct         n-day volatility of the stock price in percentage
 # fifty_MA              flt         current 50-Day MA
 # fifty_MAs_list        list        list of 50-day MAs of the days in period
 # two_hundred_MA        flt         current 200-Day MA
@@ -120,3 +124,5 @@ print("yay")
 # period_high           flt         highest stock price from the period
 # period_low            flt         lowest stock price from the period
 # expert_comments       dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
+# trend                 dict key    dictionary key to access trend message with the get_trend_message() function
+# trend_message         str         return a trend analysis and giving answer to what's happening, what it means and what's to watch for
