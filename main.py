@@ -109,8 +109,11 @@ momentum_message = get_momentum_message(momentum, ticker)
 market_cap = get_market_cap(stock)
 company_size = get_company_size(market_cap)
 
+volatility_description = analyze_volatility(volatility, company_size)
+volatility_message = get_volatility_message(volatility_description, ticker)
 
-print(company_size)
+
+print(volatility_message)
 print("yay")
 
 

@@ -136,19 +136,53 @@ def get_momentum_message(momentum, ticker):
     return messages[momentum]
 
 
-# Momentum scenarios
-# strong buying momentum = (pc >= pc_th[0]) and (rp >= 0.8) /
-# moderate buying momentum = (pc_th[1] <= pc < pc_th[0]) and (rp >= 0.6) /
-# consolidation/range-bound = (pc_th[2] < pc < pc_th[1]) and (0.4 <= rp <= 0.6) /
-# weak selling pressure = (pc_th[3] < pc <= pc_th[2]) and (rp <= 0.4) /
-# strong selling momentum = (pc <= pc_th[3]) and (rp <= 0.2) /
-# bounce attempt = (pc > 0) and (rp <= 0.3) /
-# mixed signal if else
+def analyze_volatility(volatility, company_size):
+    volatility_thresholds = {
+        "mega_cap": [0.5, 0.8, 1.2, 1.8],
+        "large_cap": [0.6, 1.0, 1.5, 2.2],
+        "mid_cap": [0.8, 1.2, 1.8, 2.8],
+        "small_cap": [1.0, 1.5, 2.2, 3.5],
+        "micro_cap": [1.5, 2.0, 3.0, 5.0],
+    }
+    vt = volatility_thresholds[company_size]
 
-# Trend scenarios
-# Strong bullish: price > 50 > 200
-# Weak bullish: 50 > price > 200
-# Transitional: 200 > price > 50
-# Bear rally: price > 200 > 50 ← Your question
-# Strong bearish: 50 > 200 > price
-# Late bearish: 200 > 50 > price
+    if volatility <= vt[0]:
+        return "very_low"
+    elif volatility <= vt[1]:
+        return "low"
+    elif volatility <= vt[2]:
+        return "moderate"
+    elif volatility <= vt[3]:
+        return "high"
+    else:
+        return "very_high"
+
+
+def get_volatility_message(volatility_description, ticker):
+    messages = {
+        "very_low": (
+            f"{ticker} shows very low volatility.\n"
+            "Price movements are exceptionally small and stable, suggesting minimal risk "
+            "but also limited short-term price appreciation potential."
+        ),
+        "low": (
+            f"{ticker} has low volatility.\n"
+            "The stock is relatively stable with modest price fluctuations, "
+            "typical of established companies or defensive sectors."
+        ),
+        "moderate": (
+            f"{ticker} is experiencing moderate volatility.\n"
+            "Price movements are noticeable, offering a balance between risk and potential returns."
+        ),
+        "high": (
+            f"{ticker} shows high volatility.\n"
+            "The stock experiences sharp price swings, indicating elevated risk "
+            "but also potential short-term trading opportunities."
+        ),
+        "very_high": (
+            f"{ticker} has very high volatility.\n"
+            "Extreme price fluctuations suggest significant risk, speculative activity, "
+            "and potential for large gains or losses in short periods."
+        ),
+    }
+    return messages[volatility_description]
