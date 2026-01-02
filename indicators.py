@@ -15,9 +15,8 @@ def get_price_changes(current, closes, days):
 def get_volatility(closes, days):
     prices = closes.tail(days)
     log_returns = np.log(prices / prices.shift(1))
-    v_flt = log_returns.std()
-    v_pct = v_flt * 100
-    return v_flt, round(v_pct, 2)
+    volatility = log_returns.std() * 100
+    return round(volatility, 2)
 
 
 def get_MAs(closes, days, window):
@@ -48,3 +47,16 @@ def get_period_high_lows(highs, lows, days):
     highs = highs.tail(days)
     lows = lows.tail(days)
     return round(highs.max(), 2), round(lows.min(), 2)
+
+
+def get_company_size(market_cap):
+    if market_cap >= 200_000_000_000:
+        return "mega_cap"
+    elif market_cap >= 10_000_000_000:
+        return "large_cap"
+    elif market_cap >= 2_000_000_000:
+        return "mid_cap"
+    elif market_cap >= 250_000_000:
+        return "small_cap"
+    else:
+        return "micro_cap"

@@ -10,7 +10,9 @@ print("-" * 67)
 print("This program provides a comprehensive analysis of a stock.")
 print("You can explore the stock's volatility, volume, and moving averages,")
 print("view visual graphs, and receive a summary recommendation at the end.")
-print("Note: Time periods use trading days only.")
+print(
+    "Note: 1mo = 21 trading days, 3mo = 63 trading days, 6mo = 126 trading days, and 1y = 252 trading days."
+)
 print("-" * 67)
 print("-" * 67)
 
@@ -44,7 +46,6 @@ period = str(
 )
 loop_period_input = True
 
-
 while loop_period_input:
     while period not in valid_period:
         print("Invalid time period. Please choose from the available options.")
@@ -69,18 +70,19 @@ while loop_period_input:
     loop_period_input = False
 print("-" * 67)
 
+stock = yf.Ticker(ticker)
 
 days_in_period = {"1mo": 21, "3mo": 63, "6mo": 126, "1y": 252}
 
 current_price, open_prices, high_prices, low_prices, close_prices, volumes = (
-    get_history_data(ticker)
+    get_history_data(stock)
 )
 
 usd_change, percent_change = get_price_changes(
     current_price, close_prices, days_in_period[period]
 )
 
-volatility_flt, volatility_pct = get_volatility(close_prices, days_in_period[period])
+volatility = get_volatility(close_prices, days_in_period[period])
 
 fifty_MA, fifty_MAs_list = get_MAs(close_prices, days_in_period[period], 50)
 two_hundred_MA, two_hundred_MAs_list = get_MAs(
@@ -92,25 +94,29 @@ current_OBV, OBVs_list = get_OBVs(close_prices, volumes, days_in_period[period])
 period_high, period_low = get_period_high_lows(
     high_prices, low_prices, days_in_period[period]
 )
+high_52wk, low_52wk = get_period_high_lows(
+    high_prices, low_prices, days_in_period["1y"]
+)
 
-expert_comments = get_recommendations(ticker)
+expert_comments = get_recommendations(stock)
 
 trend = analyze_trend(current_price, fifty_MA, two_hundred_MA)
 trend_message = get_trend_message(trend, ticker)
 
-momentum = analyze_momentum(
-    percent_change, current_price, period_high, period_low, period
-)
+momentum = analyze_momentum(percent_change, current_price, high_52wk, low_52wk, period)
 momentum_message = get_momentum_message(momentum, ticker)
 
+market_cap = get_market_cap(stock)
+company_size = get_company_size(market_cap)
 
-print(trend_message)
-print(momentum_message)
+
+print(company_size)
 print("yay")
 
 
 # ---------------------------------------------------------------------------------------
 # variable.             type        description
+# stock                 df          contains all yf library data about a stock given the ticker
 # ticker                str         stock ticker
 # period                str         user picked timeframe e.g. 1mo
 # days_in_period        dict        key value pair of days in each period e.g. 1mo:30
@@ -120,8 +126,7 @@ print("yay")
 # volumes               df_col      historical volumes of the stock
 # usd_change            flt         price changes of the stock from period begin to now
 # percent_change        pct         percentage changes of the stock prices from begin to now
-# volatility_flt        flt         n-day volatility of the stock price
-# volatility_pct    pct         n-day volatility of the stock price in percentage
+# volatility            pct         n-day volatility of the stock price in percentage
 # fifty_MA              flt         current 50-Day MA
 # fifty_MAs_list        list        list of 50-day MAs of the days in period
 # two_hundred_MA        flt         current 200-Day MA
@@ -132,4 +137,8 @@ print("yay")
 # period_low            flt         lowest stock price from the period
 # expert_comments       dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
 # trend                 dict key    dictionary key to access trend message with the get_trend_message() function
-# trend_message         str         return a trend analysis and giving answer to what's happening, what it means and what's to watch for
+# trend_message         str         return a trend analysis and some trend interpretation
+# momentum              dict key    dictionary key to access momentum message with the get_momentum_message() function
+# momentum_message      str         return a momentum analysis and some momentum interpretation
+# market_cap            int         stock's market cap in usd
+# company_size          str         company size in according to market cap
