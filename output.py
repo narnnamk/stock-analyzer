@@ -1,4 +1,4 @@
-def print_welcome():
+def print_welcome_message():
     print("-" * 67)
     print("Welcome to Stock Analyzer!")
     print("-" * 67)
@@ -8,5 +8,4 @@ def print_welcome():
     print(
         "Note: 1mo = 21 trading days, 3mo = 63 trading days, 6mo = 126 trading days, and 1y = 252 trading days."
     )
-    print("-" * 67)
     print("-" * 67)
