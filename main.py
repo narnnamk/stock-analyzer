@@ -116,8 +116,13 @@ trend_confirmation = get_trend_confirmation(
     OBVs_list, close_prices, days_in_period[period]
 )
 
+recent_cross = find_recent_cross(fifty_MAs_list, two_hundred_MAs_list)
+next_cross = predict_next_cross(fifty_MAs_list, two_hundred_MAs_list)
+
 
 print(trend_confirmation)
+print(recent_cross)
+print(next_cross)
 print("yay")
 
 
@@ -151,3 +156,6 @@ print("yay")
 # company_size              dict key    company size in according to market cap
 # volatility_description    dict key    volatility according to company size
 # volatility message        str         a volatility analysis of the stock
+# trend_confirmation        str         confirm trend using OBV
+# recent_cross              str         the most recent cross
+# next_cross                str         prediction of the next cross

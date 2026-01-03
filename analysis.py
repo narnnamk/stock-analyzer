@@ -231,3 +231,33 @@ def get_trend_confirmation(OBVs_list, close_prices, days):
         return "weak_bearish"
     else:
         return "consolidation"
+
+
+def find_recent_cross(fifty_MAs, two_hundred_MAs):
+    for i in range(len(fifty_MAs) - 1, 0, -1):
+        prev_50 = fifty_MAs[i - 1]
+        prev_200 = two_hundred_MAs[i - 1]
+        curr_50 = fifty_MAs[i]
+        curr_200 = two_hundred_MAs[i]
+
+        if prev_50 < prev_200 and curr_50 > curr_200:
+            return "golden_cross"
+
+        if prev_50 > prev_200 and curr_50 < curr_200:
+            return "death_cross"
+
+    return "no_cross"
+
+
+def predict_next_cross(fifty_MAs, two_hundred_MAs):
+    prev_gap = fifty_MAs[-2] - two_hundred_MAs[-2]
+    curr_gap = fifty_MAs[-1] - two_hundred_MAs[-1]
+
+    if abs(curr_gap) < abs(prev_gap):
+        if prev_gap > 0 and curr_gap > 0 and curr_gap < prev_gap:
+            return "possible_death_cross"
+
+        if prev_gap < 0 and curr_gap < 0 and curr_gap > prev_gap:
+            return "possible_golden_cross"
+
+    return "no_upcoming_cross"
