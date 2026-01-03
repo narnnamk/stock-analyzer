@@ -112,36 +112,42 @@ company_size = get_company_size(market_cap)
 volatility_description = analyze_volatility(volatility, company_size)
 volatility_message = get_volatility_message(volatility_description, ticker)
 
+trend_confirmation = get_trend_confirmation(
+    OBVs_list, close_prices, days_in_period[period]
+)
 
-print(volatility_message)
+
+print(trend_confirmation)
 print("yay")
 
 
 # ---------------------------------------------------------------------------------------
-# variable.             type        description
-# stock                 df          contains all yf library data about a stock given the ticker
-# ticker                str         stock ticker
-# period                str         user picked timeframe e.g. 1mo
-# days_in_period        dict        key value pair of days in each period e.g. 1mo:30
-# current_price         flt         current stock market value
-# open_prices           df_col      historical open prices of stock
-# close_prices          df_col      historical close prices of stock
-# volumes               df_col      historical volumes of the stock
-# usd_change            flt         price changes of the stock from period begin to now
-# percent_change        pct         percentage changes of the stock prices from begin to now
-# volatility            pct         n-day volatility of the stock price in percentage
-# fifty_MA              flt         current 50-Day MA
-# fifty_MAs_list        list        list of 50-day MAs of the days in period
-# two_hundred_MA        flt         current 200-Day MA
-# two_hundred_MAs_list  list        list of 200-day MAs of the days in period
-# current_OBV           int         current on balance volume
-# OBVs_list             list        list of on balance volume of the days in period
-# period_high           flt         highest stock price from the period
-# period_low            flt         lowest stock price from the period
-# expert_comments       dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
-# trend                 dict key    dictionary key to access trend message with the get_trend_message() function
-# trend_message         str         return a trend analysis and some trend interpretation
-# momentum              dict key    dictionary key to access momentum message with the get_momentum_message() function
-# momentum_message      str         return a momentum analysis and some momentum interpretation
-# market_cap            int         stock's market cap in usd
-# company_size          str         company size in according to market cap
+# variable.                 type        description
+# stock                     df          contains all yf library data about a stock given the ticker
+# ticker                    str         stock ticker
+# period                    str         user picked timeframe e.g. 1mo
+# days_in_period            dict        key value pair of days in each period e.g. 1mo:30
+# current_price             flt         current stock market value
+# open_prices               df_col      historical open prices of stock
+# close_prices              df_col      historical close prices of stock
+# volumes                   df_col      historical volumes of the stock
+# usd_change                flt         price changes of the stock from period begin to now
+# percent_change            pct         percentage changes of the stock prices from begin to now
+# volatility                pct         n-day volatility of the stock price in percentage
+# fifty_MA                  flt         current 50-Day MA
+# fifty_MAs_list            list        list of 50-day MAs of the days in period
+# two_hundred_MA            flt         current 200-Day MA
+# two_hundred_MAs_list      list        list of 200-day MAs of the days in period
+# current_OBV               int         current on balance volume
+# OBVs_list                 list        list of on balance volume of the days in period
+# period_high               flt         highest stock price from the period
+# period_low                flt         lowest stock price from the period
+# expert_comments           dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
+# trend                     dict key    dictionary key to access trend message with the get_trend_message() function
+# trend_message             str         return a trend analysis and some trend interpretation
+# momentum                  dict key    dictionary key to access momentum message with the get_momentum_message() function
+# momentum_message          str         return a momentum analysis and some momentum interpretation
+# market_cap                int         stock's market cap in usd
+# company_size              dict key    company size in according to market cap
+# volatility_description    dict key    volatility according to company size
+# volatility message        str         a volatility analysis of the stock

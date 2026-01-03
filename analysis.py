@@ -186,3 +186,48 @@ def get_volatility_message(volatility_description, ticker):
         ),
     }
     return messages[volatility_description]
+
+
+def get_trend_confirmation(OBVs_list, close_prices, days):
+    higher_close = 0
+    for i in range(-1, -days + 1, -1):
+        if close_prices.iloc[i] > close_prices.iloc[i - 1]:
+            higher_close += 1
+    price_direction = None
+    if higher_close > days * 0.6:
+        price_direction = "up"
+    elif higher_close < days * 0.4:
+        price_direction = "down"
+    else:
+        price_direction = "flat"
+
+    higher_obv = 0
+    for i in range(-1, -len(OBVs_list) + 1, -1):
+        if OBVs_list[i] > OBVs_list[i - 1]:
+            higher_obv += 1
+    OBV_direction = None
+    if higher_obv > len(OBVs_list) * 0.6:
+        OBV_direction = "up"
+    elif higher_obv < len(OBVs_list) * 0.4:
+        OBV_direction = "down"
+    else:
+        OBV_direction = "flat"
+
+    if price_direction == "up" and OBV_direction == "up":
+        return "bullish_confirm"
+    elif price_direction == "down" and OBV_direction == "down":
+        return "bearish_confirm"
+    elif price_direction == "up" and OBV_direction == "down":
+        return "bearish_divergence"
+    elif price_direction == "down" and OBV_direction == "up":
+        return "bullish_divergence"
+    elif price_direction == "flat" and OBV_direction == "up":
+        return "accumulation"
+    elif price_direction == "flat" and OBV_direction == "down":
+        return "distribution"
+    elif price_direction == "up" and OBV_direction == "flat":
+        return "weak_bullish"
+    elif price_direction == "down" and OBV_direction == "flat":
+        return "weak_bearish"
+    else:
+        return "consolidation"
