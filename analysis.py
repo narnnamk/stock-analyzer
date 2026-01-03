@@ -188,27 +188,33 @@ def get_volatility_message(volatility_description, ticker):
     return messages[volatility_description]
 
 
-def get_trend_confirmation(OBVs_list, close_prices, days):
-    higher_close = 0
+def get_volume_confirmation(OBVs_list, close_prices, days):
+    up_days = 0
+    down_days = 0
     for i in range(-1, -days + 1, -1):
         if close_prices.iloc[i] > close_prices.iloc[i - 1]:
-            higher_close += 1
+            up_days += 1
+        elif close_prices.iloc[i] < close_prices.iloc[i - 1]:
+            down_days += 1
     price_direction = None
-    if higher_close > days * 0.6:
+    if up_days > days * 0.6:
         price_direction = "up"
-    elif higher_close < days * 0.4:
+    elif down_days > days * 0.6:
         price_direction = "down"
     else:
         price_direction = "flat"
 
-    higher_obv = 0
+    up_obv = 0
+    down_obv = 0
     for i in range(-1, -len(OBVs_list) + 1, -1):
         if OBVs_list[i] > OBVs_list[i - 1]:
-            higher_obv += 1
+            up_obv += 1
+        elif OBVs_list[i] < OBVs_list[i - 1]:
+            down_obv += 1
     OBV_direction = None
-    if higher_obv > len(OBVs_list) * 0.6:
+    if up_obv > len(OBVs_list) * 0.6:
         OBV_direction = "up"
-    elif higher_obv < len(OBVs_list) * 0.4:
+    elif down_obv > len(OBVs_list) * 0.6:
         OBV_direction = "down"
     else:
         OBV_direction = "flat"
@@ -261,3 +267,121 @@ def predict_next_cross(fifty_MAs, two_hundred_MAs):
             return "possible_golden_cross"
 
     return "no_upcoming_cross"
+
+
+def get_signal_score(trend, momentum, volume_confirmation, recent_cross, next_cross):
+    """
+    Calculate stock score based on multiple technical indicators.
+    Score range: 0-100 (normalized from -10 to +10 internal scale)
+    """
+    trend_score = {
+        "strong_bullish": 3,
+        "weak_bullish": 2,
+        "transitional": 0,
+        "bear_rally": 1,
+        "late_bearish": -2,
+        "strong_bearish": -3,
+        "neutral": 0,
+    }
+
+    momentum_score = {
+        "strong_buy_momentum": 2,
+        "moderate_buy_momentum": 1,
+        "bounce_attempt": 0,
+        "consolidation": 0,
+        "mixed_signal": 0,
+        "weak_sell_momentum": -1,
+        "strong_sell_momentum": -2,
+    }
+
+    volume_score = {
+        "bullish_confirm": 2,
+        "accumulation": 1,
+        "weak_bullish": 1,
+        "consolidation": 0,
+        "bearish_divergence": -1,
+        "distribution": -1,
+        "weak_bearish": -1,
+        "bearish_confirm": -2,
+        "bullish_divergence": 1.5,
+    }
+
+    cross_score = {
+        "golden_cross": 2,
+        "possible_golden_cross": 1,
+        "no_cross": 0,
+        "no_upcoming_cross": 0,
+        "possible_death_cross": -1,
+        "death_cross": -2,
+    }
+
+    recent_weight = 0.7
+    next_weight = 0.3
+
+    weighted_cross = (
+        cross_score[recent_cross] * recent_weight
+        + cross_score[next_cross] * next_weight
+    )
+
+    score = (
+        trend_score[trend]
+        + momentum_score[momentum]
+        + volume_score[volume_confirmation]
+        + weighted_cross
+    )
+
+    max_score = 3 + 2 + 2 + (2 * 0.7 + 1 * 0.3)
+    min_score = -3 + -2 + -2 + (-2 * 0.7 + -1 * 0.3)
+
+    signal_score = round(((score - min_score) / (max_score - min_score)) * 100)
+
+    signal_score = max(0, min(100, signal_score))
+
+    return signal_score
+
+
+def interpret_signal_score(score):
+    if score >= 75:
+        return "strong_bullish"
+    elif score >= 60:
+        return "bullish"
+    elif score >= 40:
+        return "neutral"
+    elif score >= 25:
+        return "bearish"
+    else:
+        return "strong_bearish"
+
+
+def get_confidence(trend, momentum, volume_confirmation, recent_cross):
+    bullish_confirmations = 0
+    bearish_confirmations = 0
+
+    if trend in ["strong_bullish", "weak_bullish", "bear_rally"]:
+        bullish_confirmations += 1
+    if momentum in ["strong_buy_momentum", "moderate_buy_momentum"]:
+        bullish_confirmations += 1
+    if volume_confirmation in ["bullish_confirm", "accumulation", "bullish_divergence"]:
+        bullish_confirmations += 1
+    if recent_cross in ["golden_cross", "possible_golden_cross"]:
+        bullish_confirmations += 1
+
+    if trend in ["strong_bearish", "late_bearish"]:
+        bearish_confirmations += 1
+    if momentum in ["strong_sell_momentum", "weak_sell_momentum"]:
+        bearish_confirmations += 1
+    if volume_confirmation in ["bearish_confirm", "distribution", "bearish_divergence"]:
+        bearish_confirmations += 1
+    if recent_cross in ["death_cross", "possible_death_cross"]:
+        bearish_confirmations += 1
+
+    max_confirmations = max(bullish_confirmations, bearish_confirmations)
+
+    if max_confirmations >= 3:
+        confidence = "High"
+    elif max_confirmations == 2:
+        confidence = "Moderate"
+    else:
+        confidence = "Low"
+
+    return confidence

@@ -109,20 +109,23 @@ momentum_message = get_momentum_message(momentum, ticker)
 market_cap = get_market_cap(stock)
 company_size = get_company_size(market_cap)
 
-volatility_description = analyze_volatility(volatility, company_size)
-volatility_message = get_volatility_message(volatility_description, ticker)
+volatility_level = analyze_volatility(volatility, company_size)
+volatility_message = get_volatility_message(volatility_level, ticker)
 
-trend_confirmation = get_trend_confirmation(
+volume_confirmation = get_volume_confirmation(
     OBVs_list, close_prices, days_in_period[period]
 )
 
 recent_cross = find_recent_cross(fifty_MAs_list, two_hundred_MAs_list)
 next_cross = predict_next_cross(fifty_MAs_list, two_hundred_MAs_list)
 
+signal_score = get_signal_score(
+    trend, momentum, volume_confirmation, recent_cross, next_cross
+)
+outlook = interpret_signal_score(signal_score)
+confidence_level = get_confidence(trend, momentum, volume_confirmation, recent_cross)
 
-print(trend_confirmation)
-print(recent_cross)
-print(next_cross)
+
 print("yay")
 
 
@@ -156,6 +159,9 @@ print("yay")
 # company_size              dict key    company size in according to market cap
 # volatility_description    dict key    volatility according to company size
 # volatility message        str         a volatility analysis of the stock
-# trend_confirmation        str         confirm trend using OBV
+# volume_confirmation        str        confirm trend using OBV
 # recent_cross              str         the most recent cross
 # next_cross                str         prediction of the next cross
+# signal_score              int         return signal score out of 100
+# outlook                   str         return outlook direction according to signal score
+# confidence_level          str         return confidence level on signal scores
