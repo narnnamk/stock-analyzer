@@ -1,4 +1,36 @@
-from data import *
+import yfinance as yf
+import pandas as pd
+
+
+def period_covers_history(period, ticker):
+    # Days_needed:
+    # Count only trading days
+    # Added 200 days buffer to allow 200-days MA calculation
+    days_needed = {"1y": 452, "6mo": 326, "3mo": 263, "1mo": 221}
+    stock = yf.Ticker(ticker)
+    stock_history = stock.history(period="max")
+
+    if stock_history.shape[0] < days_needed["1mo"]:
+        return False
+
+    if stock_history.shape[0] < days_needed[period]:
+        return False
+    return True
+
+
+def is_valid_ticker(ticker):
+    stock = yf.Ticker(ticker)
+    stock_history = stock.history(period="1d")
+
+    if not stock_history.empty:
+        if stock.fast_info["quoteType"] == "EQUITY":
+            if period_covers_history("1mo", ticker):
+                return "valid"
+            else:
+                return "not_enough_data"
+        else:
+            return "invalid_type"
+    return "empty_data"
 
 
 def input_ticker():
@@ -22,9 +54,19 @@ def input_ticker():
     return ticker
 
 
+def is_valid_period(period, ticker):
+    valid_period = ["1mo", "3mo", "6mo", "1y"]
+    if period in valid_period:
+        if period_covers_history(period, ticker):
+            return "valid"
+        else:
+            return "not_enough_data"
+    else:
+        return "invalid"
+
+
 def input_period(ticker):
     valid_period = ["1mo", "3mo", "6mo", "1y"]
-
     print("-" * 67)
     period = str(
         input(f"{valid_period}\nEnter time period for {ticker}: ")
@@ -32,29 +74,21 @@ def input_period(ticker):
         .replace(" ", "")
         .lower()
     )
-    loop_period_input = True
+    period_check = is_valid_period(period, ticker)
 
-    while loop_period_input:
-        while period not in valid_period:
-            print("Invalid time period. Please choose from the available options.")
-            print("-" * 67)
-            period = str(
-                input(f"{valid_period}\nEnter time period for {ticker}: ")
-                .strip()
-                .replace(" ", "")
-                .lower()
-            )
-        has_enough_data = period_covers_history(period, ticker)
-        while not has_enough_data:
+    while period_check != "valid":
+        if period_check == "not_enough_data":
             print(f"{ticker} is relatively new. Please select a shorter time period.")
-            print("-" * 67)
-            period = str(
-                input(f"{valid_period}\nEnter time period for {ticker}: ")
-                .strip()
-                .replace(" ", "")
-                .lower()
-            )
-            has_enough_data = period_covers_history(period, ticker)
-        loop_period_input = False
-    print("-" * 67)
+        else:
+            print("Invalid time period. Please choose from the available options.")
+
+        print("-" * 67)
+        period = str(
+            input(f"{valid_period}\nEnter time period for {ticker}: ")
+            .strip()
+            .replace(" ", "")
+            .lower()
+        )
+        period_check = is_valid_period(period, ticker)
+
     return period
