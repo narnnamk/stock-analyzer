@@ -6,9 +6,15 @@ def is_valid_ticker(ticker):
     stock = yf.Ticker(ticker)
     stock_history = stock.history(period="1d")
 
-    if stock_history.empty:
-        return False
-    return True
+    if not stock_history.empty:
+        if stock.fast_info["quoteType"] == "EQUITY":
+            if period_covers_history("1mo", ticker):
+                return "valid"
+            else:
+                return "not_enough_data"
+        else:
+            return "invalid_type"
+    return "empty_data"
 
 
 def period_covers_history(period, ticker):

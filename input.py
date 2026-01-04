@@ -4,27 +4,20 @@ from data import *
 def input_ticker():
     print("-" * 67)
     ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
+    ticker_check = is_valid_ticker(ticker)
 
-    loop_ticker_input = True
-    while loop_ticker_input:
-        while not is_valid_ticker(ticker):
-            print("-" * 67)
-            ticker = str(
-                input("Enter the stock ticker: ").strip().replace(" ", "").upper()
-            )
-        has_enough_data = period_covers_history("1mo", ticker)
-        while not has_enough_data:
+    while ticker_check != "valid":
+        if ticker_check == "invalid_type":
+            print(f"Invalid entry. {ticker} is not a stock/equity ticker.")
+        elif ticker_check == "not_enough_data":
             print(
                 f"{ticker} does not have enough historical data to perform trend analysis.\n"
                 "Specifically, the 200-day moving average, a significant indicator, cannot be calculated."
             )
-            print("-" * 67)
-            ticker = str(
-                input("Enter the stock ticker: ").strip().replace(" ", "").upper()
-            )
-            has_enough_data = period_covers_history("1mo", ticker)
-        loop_ticker_input = False
-    print("-" * 67)
+
+        print("-" * 67)
+        ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
+        ticker_check = is_valid_ticker(ticker)
 
     return ticker
 
