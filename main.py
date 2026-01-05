@@ -30,6 +30,8 @@ two_hundred_MA, two_hundred_MAs_list = get_MAs(
     close_prices, days_in_period[period], 200
 )
 
+current_volume = volumes.iloc[-1]
+avg_volume = get_avg_volume(volumes, days_in_period[period])
 current_OBV, OBVs_list = get_OBVs(close_prices, volumes, days_in_period[period])
 
 period_high, period_low = get_period_high_lows(

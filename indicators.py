@@ -60,3 +60,8 @@ def get_company_size(market_cap):
         return "small_cap"
     else:
         return "micro_cap"
+
+
+def get_avg_volume(volumes, days):
+    volumes = volumes.tail(days)
+    return round(volumes.mean())
