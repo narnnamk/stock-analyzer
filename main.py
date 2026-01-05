@@ -66,8 +66,20 @@ signal_score = get_signal_score(
 outlook = interpret_signal_score(signal_score)
 confidence_level = get_confidence(trend, momentum, volume_confirmation, recent_cross)
 
-
-print("yay")
+print_quick_overview(
+    ticker,
+    period,
+    company_size,
+    current_price,
+    usd_change,
+    percent_change,
+    period_high,
+    period_low,
+    volatility,
+    days_in_period[period],
+    fifty_MA,
+    two_hundred_MA,
+)
 
 
 # ---------------------------------------------------------------------------------------
