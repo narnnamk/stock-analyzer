@@ -11,9 +11,39 @@ def print_welcome_message():
     print("-" * 67)
 
 
+def shorten_number(num):
+    if num >= 1_000_000_000_000_000:
+        num = f"{num / 1_000_000_000_000_000:.2f}"
+        num = num.rstrip("0")
+        num = num.rstrip(".")
+        num = f"{num}Q"
+    elif num >= 1_000_000_000_000:
+        num = f"{num / 1_000_000_000_000:.2f}"
+        num = num.rstrip("0")
+        num = num.rstrip(".")
+        num = f"{num}T"
+    elif num >= 1_000_000_000:
+        num = f"{num / 1_000_000_000:.2f}"
+        num = num.rstrip("0")
+        num = num.rstrip(".")
+        num = f"{num}B"
+    elif num >= 1_000_000:
+        num = f"{num / 1_000_000:.2f}"
+        num = num.rstrip("0")
+        num = num.rstrip(".")
+        num = f"{num}M"
+    elif num >= 1_000:
+        num = f"{num / 1_000:.2f}"
+        num = num.rstrip("0")
+        num = num.rstrip(".")
+        num = f"{num}K"
+    return num
+
+
 def print_quick_overview(
     ticker,
     period,
+    market_cap,
     size,
     price,
     usd_change,
@@ -29,6 +59,7 @@ def print_quick_overview(
     print(f"{ticker} Quick Stock Overview")
     print("=" * 67)
     print(f"Period: {period}")
+    print(f"Market Cap: {shorten_number(market_cap)}")
     print(f"Company Size: {size.replace('_', ' ').title()}\n")
     print(f"Current Price: ${price}")
     print(

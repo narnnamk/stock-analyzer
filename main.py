@@ -69,6 +69,7 @@ confidence_level = get_confidence(trend, momentum, volume_confirmation, recent_c
 print_quick_overview(
     ticker,
     period,
+    market_cap,
     company_size,
     current_price,
     usd_change,
