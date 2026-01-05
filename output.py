@@ -48,6 +48,8 @@ def print_quick_overview(
     price,
     usd_change,
     pct_change,
+    curr_volume,
+    avg_volume,
     high,
     low,
     volatility,
@@ -65,9 +67,11 @@ def print_quick_overview(
     print(
         f"Change: {'+' if usd_change >= 0 else '-'}${abs(usd_change)} ({'+' if pct_change >= 0 else '-'}{abs(pct_change)}%)\n"
     )
+    print(f"Volume: {shorten_number(curr_volume)}")
+    print(f"Average Volume: {shorten_number(avg_volume)}\n")
     print(f"Period High: ${high}")
     print(f"Period Low: ${low}")
     print(f"Volatility ({days}-Day): {volatility}%\n")
-    print(f"50-Day MA: {fifty_MA}")
-    print(f"200-day MA: {twoH_MA}")
+    print(f"50-Day MA: ${fifty_MA}")
+    print(f"200-day MA: ${twoH_MA}")
     print("=" * 67)

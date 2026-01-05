@@ -76,6 +76,8 @@ print_quick_overview(
     current_price,
     usd_change,
     percent_change,
+    current_volume,
+    avg_volume,
     period_high,
     period_low,
     volatility,
@@ -102,6 +104,8 @@ print_quick_overview(
 # fifty_MAs_list            list        list of 50-day MAs of the days in period
 # two_hundred_MA            flt         current 200-Day MA
 # two_hundred_MAs_list      list        list of 200-day MAs of the days in period
+# current_volume            int         latest volume
+# avg_volume                int         average volume over the period
 # current_OBV               int         current on balance volume
 # OBVs_list                 list        list of on balance volume of the days in period
 # period_high               flt         highest stock price from the period
