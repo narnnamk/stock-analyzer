@@ -11,32 +11,36 @@ def print_welcome_message():
     print("-" * 67)
 
 
+def remove_decimals(num):
+    num = num.rstrip("0").rstrip(".")
+
+    if "." not in num:
+        return num
+
+    whole = num.split(".")[0]
+
+    if len(whole) >= 3:
+        return whole
+    elif len(whole) >= 2:
+        return f"{float(num):.1f}".rstrip("0").rstrip(".")
+    else:
+        return num
+
+
 def shorten_number(num):
-    if num >= 1_000_000_000_000_000:
-        num = f"{num / 1_000_000_000_000_000:.2f}"
-        num = num.rstrip("0")
-        num = num.rstrip(".")
-        num = f"{num}Q"
-    elif num >= 1_000_000_000_000:
-        num = f"{num / 1_000_000_000_000:.2f}"
-        num = num.rstrip("0")
-        num = num.rstrip(".")
-        num = f"{num}T"
-    elif num >= 1_000_000_000:
-        num = f"{num / 1_000_000_000:.2f}"
-        num = num.rstrip("0")
-        num = num.rstrip(".")
-        num = f"{num}B"
-    elif num >= 1_000_000:
-        num = f"{num / 1_000_000:.2f}"
-        num = num.rstrip("0")
-        num = num.rstrip(".")
-        num = f"{num}M"
-    elif num >= 1_000:
-        num = f"{num / 1_000:.2f}"
-        num = num.rstrip("0")
-        num = num.rstrip(".")
-        num = f"{num}K"
+    units = [
+        (1_000_000_000_000_000, "Q"),
+        (1_000_000_000_000, "T"),
+        (1_000_000_000, "B"),
+        (1_000_000, "M"),
+        (1_000, "K"),
+    ]
+
+    for value, suffix in units:
+        if num >= value:
+            num = f"{num / value:.2f}"
+            return f"{remove_decimals(num)}{suffix}"
+
     return num
 
 
