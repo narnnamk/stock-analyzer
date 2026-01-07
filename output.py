@@ -135,7 +135,7 @@ def print_trend_message(trend):
     return print(f"Trend:\n{messages[trend]}\n")
 
 
-def print_momentum_message(momentum: str):
+def print_momentum_message(momentum):
     messages = {
         "strong_buy": (
             "STRONG BUY - "
@@ -190,9 +190,71 @@ def print_momentum_message(momentum: str):
     return print(f"Momentum:\n{messages[momentum]}\n")
 
 
-def print_stock_analysis(ticker, trend, momentum):
+def print_volume_message(volume_confirmation: str):
+    messages = {
+        "bullish_confirm": (
+            "BULLISH CONFIRM - Volume confirms the bullish move.\n"
+            "Price has been trending up and OBV is also rising.\n"
+            "That usually means buying pressure is supporting the uptrend."
+        ),
+        "bearish_confirm": (
+            "BEARISH CONFIRM - Volume confirms the bearish move.\n"
+            "Price has been trending down and OBV is also falling.\n"
+            "That usually means selling pressure is supporting the downtrend."
+        ),
+        "bearish_divergence": (
+            "BEARISH DIVERGENCE - "
+            "Price is moving up, but OBV is moving down.\n"
+            "That can mean the rally is not supported by real buying pressure.\n"
+            "Be cautious, because this setup can lead to pullbacks or reversals."
+        ),
+        "bullish_divergence": (
+            "BULLISH DIVERGENCE - "
+            "Price is moving down, but OBV is moving up.\n"
+            "That can mean buyers are quietly stepping in while price is still weak.\n"
+            "If price stabilizes, this can be an early reversal clue."
+        ),
+        "accumulation": (
+            "ACCUMULATION - "
+            "Price is mostly flat, but OBV is trending up.\n"
+            "That can mean investors are buying in the background without moving price much.\n"
+            "A breakout is more likely if this accumulation continues."
+        ),
+        "distribution": (
+            "DISTRIBUTION - "
+            "Price is mostly flat, but OBV is trending down.\n"
+            "That can mean selling is happening quietly while price still looks stable.\n"
+            "A breakdown is more likely if this distribution continues."
+        ),
+        "weak_bullish": (
+            "WEAK BULLISH - "
+            "Price is trending up, but OBV is mostly flat.\n"
+            "That can mean the move is drifting higher without strong demand.\n"
+            "This trend can continue, but it is easier to fade if buyers do not step in."
+        ),
+        "weak_bearish": (
+            "WEAK BEARISH - "
+            "Price is trending down, but OBV is mostly flat.\n"
+            "That can mean the drop is happening without strong selling pressure.\n"
+            "This can turn into a bounce if buyers show up."
+        ),
+        "consolidation": (
+            "CONSOLIDATION - "
+            "Neither price nor OBV is showing a strong direction.\n"
+            "This often happens during consolidation and indecision.\n"
+            "Waiting for a clear volume shift can help confirm the next move."
+        ),
+    }
+
+    return print(
+        f"Volume:\n{messages.get(volume_confirmation, 'Volume explanation is unavailable right now.')}\n"
+    )
+
+
+def print_stock_analysis(ticker, trend, momentum, volume_confirmation):
     print(f"{ticker} Technical Analysis")
     print("-" * 67)
     print_trend_message(trend)
     print_momentum_message(momentum)
+    print_volume_message(volume_confirmation)
     print("=" * 67)

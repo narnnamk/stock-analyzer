@@ -84,7 +84,7 @@ print_quick_overview(
     two_hundred_MA,
 )
 
-print_stock_analysis(ticker, trend, momentum)
+print_stock_analysis(ticker, trend, momentum, volume_confirmation)
 
 
 # ---------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ print_stock_analysis(ticker, trend, momentum)
 # market_cap                int         stock's market cap in usd
 # company_size              dict key    company size in according to market cap
 # volatility_description    dict key    volatility according to company size
-# volume_confirmation        str        confirm trend using OBV
+# volume_confirmation       str         confirm trend using OBV
 # recent_cross              str         the most recent cross
 # next_cross                str         prediction of the next cross
 # signal_score              int         return signal score out of 100
