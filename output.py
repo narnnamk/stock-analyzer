@@ -132,11 +132,67 @@ def print_trend_message(trend):
         ),
     }
 
-    return print(f"Trend:\n{messages[trend]}")
+    return print(f"Trend:\n{messages[trend]}\n")
 
 
-def print_stock_analysis(ticker, trend):
+def print_momentum_message(momentum: str):
+    messages = {
+        "strong_buy": (
+            "STRONG BUY - "
+            "The percent gain for this period is high, and price is trading near the top of its range.\n"
+            "That usually means buyers are in control and the move has strength.\n"
+            "Be careful with sudden pullbacks after strong runs."
+        ),
+        "moderate_buy": (
+            "MODERATE BUY - "
+            "The percent gain is solid for the period, and price is in the upper part of the range.\n"
+            "This suggests steady buying pressure and healthy trend continuation.\n"
+            "Holding in the upper range keeps the momentum strong."
+        ),
+        "bounce_attempt": (
+            "BOUNCE ATTEMPT - "
+            "The period return is positive, but price is still close to the lower part of the range.\n"
+            "That can happen when a stock is trying to recover after weakness.\n"
+            "A push toward the middle or upper range would confirm stronger momentum."
+        ),
+        "consolidation": (
+            "CONSOLIDATION - "
+            "Price is sitting around the middle of the range without a strong percent move.\n"
+            "This often means the market is undecided right now.\n"
+            "A break out of the range is usually the next important signal."
+        ),
+        "weak_sell": (
+            "WEAK SELL - "
+            "The period return is negative and price is sitting in the lower part of its range.\n"
+            "Sellers have an advantage, but it does not look like a full breakdown yet.\n"
+            "A recovery back toward the mid-range would improve the signal."
+        ),
+        "strong_sell": (
+            "STRONG SELL - "
+            "The percent drop for this period is large, and price is near the bottom of its range.\n"
+            "This often signals strong selling pressure and weak demand.\n"
+            "It usually takes a strong reversal to shift this momentum."
+        ),
+        "mixed_signal": (
+            "MIXED SIGNAL - "
+            "The percent change and the range position do not line up into a strong setup.\n"
+            "This can happen in choppy markets where price swings both ways.\n"
+            "Waiting for a cleaner signal may reduce false entries."
+        ),
+        "no_movement": (
+            "NO MOVEMENT - "
+            "The high and low are the same, so the range is flat.\n"
+            "This can happen with very low volume or limited data.\n"
+            "Momentum cannot be judged reliably in this situation."
+        ),
+    }
+
+    return print(f"Momentum:\n{messages[momentum]}\n")
+
+
+def print_stock_analysis(ticker, trend, momentum):
     print(f"{ticker} Technical Analysis")
     print("-" * 67)
     print_trend_message(trend)
+    print_momentum_message(momentum)
     print("=" * 67)

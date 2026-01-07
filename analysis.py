@@ -40,17 +40,17 @@ def analyze_momentum(percent_change, price, high, low, period):
     rp_th = range_position_threshold
 
     if (pc >= pc_th[0]) and (rp >= rp_th[0]):
-        return "strong_buy_momentum"
+        return "strong_buy"
     elif (pc <= pc_th[3]) and (rp <= rp_th[3]):
-        return "strong_sell_momentum"
+        return "strong_sell"
     elif (pc > 0) and (rp <= 0.3):
         return "bounce_attempt"
     elif (pc_th[1] <= pc < pc_th[0]) and (rp >= rp_th[1]):
-        return "moderate_buy_momentum"
+        return "moderate_buy"
     elif (pc_th[2] <= pc <= pc_th[1]) and (rp_th[2] <= rp <= rp_th[1]):
         return "consolidation"
     elif (pc_th[3] < pc <= pc_th[2]) and (rp <= rp_th[2]):
-        return "weak_sell_momentum"
+        return "weak_sell"
     else:
         return "mixed_signal"
 
@@ -174,13 +174,13 @@ def get_signal_score(trend, momentum, volume_confirmation, recent_cross, next_cr
     }
 
     momentum_score = {
-        "strong_buy_momentum": 2,
-        "moderate_buy_momentum": 1,
+        "strong_buy": 2,
+        "moderate_buy": 1,
         "bounce_attempt": 0,
         "consolidation": 0,
         "mixed_signal": 0,
-        "weak_sell_momentum": -1,
-        "strong_sell_momentum": -2,
+        "weak_sell": -1,
+        "strong_sell": -2,
     }
 
     volume_score = {

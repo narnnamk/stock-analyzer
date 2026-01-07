@@ -84,7 +84,7 @@ print_quick_overview(
     two_hundred_MA,
 )
 
-print_stock_analysis(ticker, trend)
+print_stock_analysis(ticker, trend, momentum)
 
 
 # ---------------------------------------------------------------------------------------
