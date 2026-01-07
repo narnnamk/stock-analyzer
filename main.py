@@ -84,7 +84,17 @@ print_quick_overview(
     two_hundred_MA,
 )
 
-print_stock_analysis(ticker, trend, momentum, volume_confirmation)
+print_stock_analysis(
+    ticker,
+    trend,
+    momentum,
+    volume_confirmation,
+    recent_cross,
+    next_cross,
+    signal_score,
+    outlook,
+    confidence_level,
+)
 
 
 # ---------------------------------------------------------------------------------------

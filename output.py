@@ -1,14 +1,14 @@
 def print_welcome_message():
-    print("-" * 67)
+    print("-" * 100)
     print("Welcome to Stock Analyzer!")
-    print("-" * 67)
+    print("-" * 100)
     print("This program provides a comprehensive analysis of a stock.")
     print("You can explore the stock's volatility, volume, and moving averages,")
     print("view visual graphs, and receive a summary recommendation at the end.")
     print(
         "Note: 1mo = 21 trading days, 3mo = 63 trading days, 6mo = 126 trading days, and 1y = 252 trading days."
     )
-    print("-" * 67)
+    print("-" * 100)
 
 
 def remove_decimals(num):
@@ -62,12 +62,12 @@ def print_quick_overview(
     fifty_MA,
     twoH_MA,
 ):
-    print("=" * 67)
+    print("=" * 100)
     print("STOCK ANALYZER")
     print(f"Ticker: {ticker} | Period: {period}")
-    print("=" * 67)
+    print("=" * 100)
     print("Quick Overview")
-    print("-" * 67)
+    print("-" * 100)
     print(f"Market Cap: {shorten_number(market_cap)}")
     print(f"Company Size: {size.replace('_', ' ').title()}\n")
     print(f"Current Price: ${price}")
@@ -83,7 +83,7 @@ def print_quick_overview(
     )
     print(f"50-Day MA: ${fifty_MA}")
     print(f"200-day MA: ${twoH_MA}")
-    print("=" * 67)
+    print("=" * 100)
 
 
 def print_trend_message(trend):
@@ -251,10 +251,36 @@ def print_volume_message(volume_confirmation: str):
     )
 
 
-def print_stock_analysis(ticker, trend, momentum, volume_confirmation):
+def print_MA_cross(recent, next):
+    print("MA Cross:")
+    print(f"Recent Cross: {recent.replace('_', ' ').title()}")
+    print(f"Next Cross: {next.replace('_', ' ').title()}\n")
+
+
+def print_signal_outlook(score, outlook, confidence):
+    print("Signal & Outlook")
+    print(f"Signal Score: {score}/100")
+    print(f"Outlook: {outlook.replace('_', ' ').title()}")
+    print(f"Confidence: {confidence}")
+
+
+def print_stock_analysis(
+    ticker,
+    trend,
+    momentum,
+    volume_confirmation,
+    recent,
+    next,
+    score,
+    outlook,
+    confidence,
+):
     print(f"{ticker} Technical Analysis")
-    print("-" * 67)
+    print("-" * 100)
     print_trend_message(trend)
     print_momentum_message(momentum)
     print_volume_message(volume_confirmation)
-    print("=" * 67)
+    print_MA_cross(recent, next)
+    print("-" * 100)
+    print_signal_outlook(score, outlook, confidence)
+    print("=" * 100)

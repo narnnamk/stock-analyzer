@@ -34,7 +34,7 @@ def is_valid_ticker(ticker):
 
 
 def input_ticker():
-    print("-" * 67)
+    print("-" * 100)
     ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
     ticker_check = is_valid_ticker(ticker)
 
@@ -47,7 +47,7 @@ def input_ticker():
                 "Specifically, the 200-day moving average, a significant indicator, cannot be calculated."
             )
 
-        print("-" * 67)
+        print("-" * 100)
         ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
         ticker_check = is_valid_ticker(ticker)
 
@@ -67,7 +67,7 @@ def is_valid_period(period, ticker):
 
 def input_period(ticker):
     valid_period = ["1mo", "3mo", "6mo", "1y"]
-    print("-" * 67)
+    print("-" * 100)
     period = str(
         input(f"{valid_period}\nEnter time period for {ticker}: ")
         .strip()
@@ -82,7 +82,7 @@ def input_period(ticker):
         else:
             print("Invalid time period. Please choose from the available options.")
 
-        print("-" * 67)
+        print("-" * 100)
         period = str(
             input(f"{valid_period}\nEnter time period for {ticker}: ")
             .strip()
