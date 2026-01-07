@@ -41,7 +41,8 @@ high_52wk, low_52wk = get_period_high_lows(
     high_prices, low_prices, days_in_period["1y"]
 )
 
-expert_comments = get_recommendations(stock)
+recommendations = get_recommendations(stock)
+recommendations_pct = get_recommendations_pct(recommendations)
 
 trend = analyze_trend(current_price, fifty_MA, two_hundred_MA)
 
@@ -90,6 +91,7 @@ print_stock_analysis(
     volume_confirmation,
     recent_cross,
     next_cross,
+    recommendations_pct,
     signal_score,
     outlook,
     confidence_level,
@@ -119,7 +121,8 @@ print_stock_analysis(
 # OBVs_list                 list        list of on balance volume of the days in period
 # period_high               flt         highest stock price from the period
 # period_low                flt         lowest stock price from the period
-# expert_comments           dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
+# recommendations           dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
+# recommendations_pct       list        return buy, hold, sell in percent according to recommendations
 # trend                     dict key    dictionary key to access trend message with the get_trend_message() function
 # momentum                  dict key    dictionary key to access momentum message with the get_momentum_message() function
 # market_cap                int         stock's market cap in usd

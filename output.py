@@ -257,6 +257,11 @@ def print_MA_cross(recent, next):
     print(f"Next Cross: {next.replace('_', ' ').title()}\n")
 
 
+def print_expert_ratings(pct):
+    print("Experts Ratings:")
+    print(f"Buy - {pct[0]}%\nHold - {pct[1]}%\nSell - {pct[2]}%")
+
+
 def print_summary(score, outlook, confidence):
     print("Summary:")
     print(f"Signal Score: {score}/100")
@@ -325,6 +330,7 @@ def print_stock_analysis(
     volume_confirmation,
     recent,
     next,
+    recommendations_pct,
     score,
     outlook,
     confidence,
@@ -335,6 +341,7 @@ def print_stock_analysis(
     print_momentum_message(momentum)
     print_volume_message(volume_confirmation)
     print_MA_cross(recent, next)
+    print_expert_ratings(recommendations_pct)
     print("-" * 100)
     print_summary(score, outlook, confidence)
     print("=" * 100)

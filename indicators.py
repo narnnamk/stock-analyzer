@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import math
 
 
 def get_price_changes(current, closes, days):
@@ -65,3 +66,34 @@ def get_company_size(market_cap):
 def get_avg_volume(volumes, days):
     volumes = volumes.tail(days)
     return round(volumes.mean())
+
+
+def get_recommendations_pct(recommendations):
+    counts = [
+        recommendations["strongBuy"] + recommendations["buy"],
+        recommendations["hold"],
+        recommendations["strongSell"] + recommendations["sell"],
+    ]
+    total = sum(counts)
+
+    if total == 0:
+        return [0, 0, 0]
+
+    list_pct = [
+        (counts[0] / total) * 100,
+        (counts[1] / total) * 100,
+        (counts[2] / total) * 100,
+    ]
+
+    floors = [math.floor(p) for p in list_pct]
+    decimals = [list_pct[i] - floors[i] for i in range(3)]
+
+    missing_pct = 100 - sum(floors)
+
+    while missing_pct > 0:
+        largest_i = decimals.index(max(decimals))
+        floors[largest_i] += 1
+        decimals[largest_i] = 0
+        missing_pct -= 1
+
+    return floors
