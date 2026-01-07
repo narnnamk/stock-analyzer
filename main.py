@@ -85,7 +85,6 @@ print_quick_overview(
 )
 
 print_stock_analysis(
-    ticker,
     trend,
     momentum,
     volume_confirmation,

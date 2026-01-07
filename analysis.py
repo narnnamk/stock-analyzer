@@ -159,10 +159,6 @@ def predict_next_cross(fifty_MAs, two_hundred_MAs):
 
 
 def get_signal_score(trend, momentum, volume_confirmation, recent_cross, next_cross):
-    """
-    Calculate stock score based on multiple technical indicators.
-    Score range: 0-100 (normalized from -10 to +10 internal scale)
-    """
     trend_score = {
         "strong_bullish": 3,
         "weak_bullish": 2,

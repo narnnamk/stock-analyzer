@@ -257,15 +257,69 @@ def print_MA_cross(recent, next):
     print(f"Next Cross: {next.replace('_', ' ').title()}\n")
 
 
-def print_signal_outlook(score, outlook, confidence):
-    print("Signal & Outlook")
+def print_summary(score, outlook, confidence):
+    print("Summary:")
     print(f"Signal Score: {score}/100")
     print(f"Outlook: {outlook.replace('_', ' ').title()}")
-    print(f"Confidence: {confidence}")
+    print(f"Confidence: {confidence}\n")
+    print_summary_message(score, outlook, confidence)
+
+
+def print_summary_message(score, outlook, confidence):
+    outlook_word = {
+        "strong_bullish": "strongly bullish",
+        "bullish": "bullish",
+        "neutral": "neutral",
+        "bearish": "bearish",
+        "strong_bearish": "strongly bearish",
+    }
+
+    confidence_word = {
+        "High": "high",
+        "Moderate": "moderate",
+        "Low": "low",
+    }
+
+    outlook_line = {
+        "strong_bullish": "The overall picture leans clearly to the upside.",
+        "bullish": "The balance of signals is slightly positive.",
+        "neutral": "The signals are split and the direction is not very clear.",
+        "bearish": "The balance of signals is slightly negative.",
+        "strong_bearish": "The overall picture leans clearly to the downside.",
+    }
+
+    confidence_line = {
+        "High": "A good number of indicators are telling a similar story.",
+        "Moderate": "There is some agreement, but a few areas are still mixed.",
+        "Low": "Different indicators are pulling in different directions right now.",
+    }
+
+    next_step_line = {
+        "strong_bullish": "If price stays strong, the trend is likely to remain intact, but sharp pullbacks are still possible.",
+        "bullish": "If the stock can keep building strength, the outlook can improve, but it's worth watching for any loss of momentum.",
+        "neutral": "A breakout or breakdown from the current range is usually what brings clarity from here.",
+        "bearish": "A bounce can happen at any time, but it would take follow-through to shift the outlook back to neutral.",
+        "strong_bearish": "Stabilization is the first thing to look for before expecting a bigger recovery.",
+    }
+
+    risk_line = {
+        "High": "Even with higher confidence, it's smart to manage risk because markets can flip quickly.",
+        "Moderate": "Keeping risk controlled makes sense until the picture becomes cleaner.",
+        "Low": "It may be better to stay patient or keep sizing small until signals line up better.",
+    }
+
+    paragraph = (
+        f"With a signal score of {score}/100, the overall setup looks {outlook_word[outlook]}. "
+        f"{outlook_line[outlook]}\n"
+        f"Confidence is {confidence_word[confidence]}, which means {confidence_line[confidence].lower()}\n"
+        f"{next_step_line[outlook]}\n"
+        f"{risk_line[confidence]}"
+    )
+
+    return print(paragraph)
 
 
 def print_stock_analysis(
-    ticker,
     trend,
     momentum,
     volume_confirmation,
@@ -275,12 +329,12 @@ def print_stock_analysis(
     outlook,
     confidence,
 ):
-    print(f"{ticker} Technical Analysis")
+    print("Technical Analysis")
     print("-" * 100)
     print_trend_message(trend)
     print_momentum_message(momentum)
     print_volume_message(volume_confirmation)
     print_MA_cross(recent, next)
     print("-" * 100)
-    print_signal_outlook(score, outlook, confidence)
+    print_summary(score, outlook, confidence)
     print("=" * 100)
