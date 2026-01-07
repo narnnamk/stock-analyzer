@@ -44,16 +44,13 @@ high_52wk, low_52wk = get_period_high_lows(
 expert_comments = get_recommendations(stock)
 
 trend = analyze_trend(current_price, fifty_MA, two_hundred_MA)
-trend_message = get_trend_message(trend, ticker)
 
 momentum = analyze_momentum(percent_change, current_price, high_52wk, low_52wk, period)
-momentum_message = get_momentum_message(momentum, ticker)
 
 market_cap = get_market_cap(stock)
 company_size = get_company_size(market_cap)
 
 volatility_level = analyze_volatility(volatility, company_size)
-volatility_message = get_volatility_message(volatility_level, ticker)
 
 volume_confirmation = get_volume_confirmation(
     OBVs_list, close_prices, days_in_period[period]
@@ -81,10 +78,13 @@ print_quick_overview(
     period_high,
     period_low,
     volatility,
+    volatility_level,
     days_in_period[period],
     fifty_MA,
     two_hundred_MA,
 )
+
+print_stock_analysis(ticker, trend)
 
 
 # ---------------------------------------------------------------------------------------
@@ -112,13 +112,10 @@ print_quick_overview(
 # period_low                flt         lowest stock price from the period
 # expert_comments           dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
 # trend                     dict key    dictionary key to access trend message with the get_trend_message() function
-# trend_message             str         return a trend analysis and some trend interpretation
 # momentum                  dict key    dictionary key to access momentum message with the get_momentum_message() function
-# momentum_message          str         return a momentum analysis and some momentum interpretation
 # market_cap                int         stock's market cap in usd
 # company_size              dict key    company size in according to market cap
 # volatility_description    dict key    volatility according to company size
-# volatility message        str         a volatility analysis of the stock
 # volume_confirmation        str        confirm trend using OBV
 # recent_cross              str         the most recent cross
 # next_cross                str         prediction of the next cross
