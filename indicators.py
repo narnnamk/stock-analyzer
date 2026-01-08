@@ -16,7 +16,7 @@ def get_price_changes(current, closes, days):
 def get_volatility(closes, days):
     prices = closes.tail(days)
     log_returns = np.log(prices / prices.shift(1))
-    volatility = log_returns.std() * 100
+    volatility = log_returns.std() * np.sqrt(252) * 100
     return round(volatility, 2)
 
 

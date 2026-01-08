@@ -127,7 +127,7 @@ print_stock_analysis(
 # momentum                  dict key    dictionary key to access momentum message with the get_momentum_message() function
 # market_cap                int         stock's market cap in usd
 # company_size              dict key    company size in according to market cap
-# volatility_description    dict key    volatility according to company size
+# volatility_description    dict key    annualized volatility according to company size
 # volume_confirmation       str         confirm trend using OBV
 # recent_cross              str         the most recent cross
 # next_cross                str         prediction of the next cross

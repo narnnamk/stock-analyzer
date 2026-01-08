@@ -277,9 +277,9 @@ def print_expert_ratings(pct):
 
 
 def print_summary(score, outlook, confidence):
-    print(f"{'Signal Score':<13}- {score}/100")
-    print(f"{'Outlook':<13}- {outlook.replace('_', ' ').title()}")
-    print(f"{'Confidence':<13}- {confidence}\n")
+    print(f"{'Signal Score':<13}: {score}/100")
+    print(f"{'Outlook':<13}: {outlook.replace('_', ' ').title()}")
+    print(f"{'Confidence':<13}: {confidence}\n")
     print_summary_message(score, outlook, confidence)
 
 

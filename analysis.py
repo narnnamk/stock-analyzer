@@ -57,12 +57,13 @@ def analyze_momentum(percent_change, price, high, low, period):
 
 def analyze_volatility(volatility, company_size):
     volatility_thresholds = {
-        "mega_cap": [0.5, 0.8, 1.2, 1.8],
-        "large_cap": [0.6, 1.0, 1.5, 2.2],
-        "mid_cap": [0.8, 1.2, 1.8, 2.8],
-        "small_cap": [1.0, 1.5, 2.2, 3.5],
-        "micro_cap": [1.5, 2.0, 3.0, 5.0],
+        "mega_cap": [10, 15, 22, 30],
+        "large_cap": [12, 17, 25, 35],
+        "mid_cap": [15, 22, 32, 45],
+        "small_cap": [18, 27, 40, 60],
+        "micro_cap": [25, 35, 55, 85],
     }
+
     vt = volatility_thresholds[company_size]
 
     if volatility <= vt[0]:
