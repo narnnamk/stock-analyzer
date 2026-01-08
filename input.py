@@ -1,5 +1,8 @@
 import yfinance as yf
-import pandas as pd
+# import pandas as pd
+
+
+width = 100
 
 
 def period_covers_history(period, ticker):
@@ -34,7 +37,7 @@ def is_valid_ticker(ticker):
 
 
 def input_ticker():
-    print("-" * 100)
+    global width
     ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
     ticker_check = is_valid_ticker(ticker)
 
@@ -47,10 +50,10 @@ def input_ticker():
                 "Specifically, the 200-day moving average, a significant indicator, cannot be calculated."
             )
 
-        print("-" * 100)
+        print("-" * width)
         ticker = str(input("Enter the stock ticker: ").strip().replace(" ", "").upper())
         ticker_check = is_valid_ticker(ticker)
-
+    print("=" * width)
     return ticker
 
 
@@ -66,8 +69,8 @@ def is_valid_period(period, ticker):
 
 
 def input_period(ticker):
+    global width
     valid_period = ["1mo", "3mo", "6mo", "1y"]
-    print("-" * 100)
     period = str(
         input(f"{valid_period}\nEnter time period for {ticker}: ")
         .strip()
@@ -82,7 +85,7 @@ def input_period(ticker):
         else:
             print("Invalid time period. Please choose from the available options.")
 
-        print("-" * 100)
+        print("-" * width)
         period = str(
             input(f"{valid_period}\nEnter time period for {ticker}: ")
             .strip()
@@ -90,6 +93,6 @@ def input_period(ticker):
             .lower()
         )
         period_check = is_valid_period(period, ticker)
-    print("-" * 100)
+    print("=" * width)
 
     return period

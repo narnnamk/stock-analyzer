@@ -1,5 +1,8 @@
 import textwrap
 
+width = 100
+quarter_w = 100 // 4
+
 
 def wrap(text, width=72, indent=""):
     return textwrap.fill(
@@ -8,16 +11,23 @@ def wrap(text, width=72, indent=""):
 
 
 def print_welcome_message():
-    print("-" * 100)
+    global width
+    print("\n\n\n")
+    print("=" * width)
     print("Welcome to Stock Analyzer!")
-    print("-" * 100)
-    print("This program provides a comprehensive analysis of a stock.")
-    print("You can explore the stock's volatility, volume, and moving averages,")
-    print("view visual graphs, and receive a summary recommendation at the end.")
+    print("-" * width)
     print(
-        "Note: 1mo = 21 trading days, 3mo = 63 trading days, 6mo = 126 trading days, and 1y = 252 trading days."
+        "This program provides a technical analysis of a stock using price and volume data."
     )
-    print("-" * 100)
+    print(
+        "It evaluates trend, momentum, volume confirmation, volatility, and MA crosses,"
+    )
+    print(
+        "shows charts, and gives an overall score, outlook, and confidence at the end."
+    )
+    print("Note: 1mo = 21 trading days, 3mo = 63, 6mo = 126, and 1y = 252.")
+    print("Get started by entering a stock ticker and a time period.")
+    print("=" * width)
 
 
 def remove_decimals(num):
@@ -53,11 +63,16 @@ def shorten_number(num):
     return num
 
 
+def add_zero_to_price_decimals(price):
+    if len(str(price).split(".")[1]) == 1:
+        return str(price) + "0"
+    return price
+
+
 def print_quick_overview(
     ticker,
     period,
     market_cap,
-    size,
     price,
     usd_change,
     pct_change,
@@ -67,32 +82,46 @@ def print_quick_overview(
     low,
     volatility,
     volatility_level,
-    days,
-    fifty_MA,
-    twoH_MA,
 ):
+    global width
+    global quarter_w
+    price = add_zero_to_price_decimals(price)
+    high = add_zero_to_price_decimals(high)
+    low = add_zero_to_price_decimals(low)
+    usd_change = add_zero_to_price_decimals(usd_change)
     print("\n\n\n")
-    print("=" * 100)
-    print("STOCK ANALYZER")
-    print(f"Ticker: {ticker} | Period: {period}")
-    print("=" * 100)
-    print("QUICK OVERVIEW")
-    print("-" * 100)
-    print(f"{'Current Price':<25}{'Market Cap':<25}")
-    print(f"${price:<24}{shorten_number(market_cap):<25}\n")
-    print(f"{'Period High':<25}{'Period Low':<25}")
-    print(f"${high:<24}${low:<24}\n")
-    print(f"{'Price Change':<25}{'Volatility':<25}")
+    print("=" * width)
+    print(f"{'STOCK ANALYZER':^{width}}")
+    ticker_row = f"Ticker: {ticker} | Period: {period}"
+    print(f"{ticker_row:^{width}}")
+    print("=" * width)
+    print(f"{'QUICK OVERVIEW':^{width}}")
+    print("-" * width)
+    price_label_row = f"{'Current Price':<{quarter_w}}{'Period High':<{quarter_w}}{'Period Low':<{quarter_w}}{'Price Change':<{quarter_w}}"
     change_str = (
         f"{'+' if usd_change >= 0 else '-'}${abs(usd_change):.2f} ({pct_change:+.2f}%)"
     )
+    price_row = f"${price:<{quarter_w - 1}}${high:<{quarter_w - 1}}${low:<{quarter_w - 1}}{change_str:<{quarter_w}}\n"
+    print(price_label_row)
+    print(price_row)
+
+    volume_label_row = f"{'Volume':<{quarter_w}}{'Average Volume':<{quarter_w}}{'Market Cap':<{quarter_w}}{'Volatility':<{quarter_w}}"
     volatility_str = f"{volatility}% ({volatility_level.replace('_', ' ').title()})"
-    print(f"{change_str:<25}{volatility_str:<25}\n")
-    print(f"{'Volume':<25}{'Average Volume':<25}")
-    print(f"{shorten_number(curr_volume):<25}{shorten_number(avg_volume):<25}\n")
-    print(f"{'50-Day MA':<25}{'200-Day MA':<25}")
-    print(f"${fifty_MA:<24}${twoH_MA:<24}")
-    print("=" * 100)
+    volume_row = f"{shorten_number(curr_volume):<{quarter_w}}{shorten_number(avg_volume):<{quarter_w}}{shorten_number(market_cap):<{quarter_w}}{volatility_str:<{quarter_w}}\n"
+    print(volume_label_row)
+    print(volume_row)
+
+    print("=" * width)
+
+
+def print_MA_info(recent, next, fifty_MA, twoH_MA):
+    global quarter_w
+    fifty_MA = add_zero_to_price_decimals(fifty_MA)
+    twoH_MA = add_zero_to_price_decimals(twoH_MA)
+    row1 = f"{'50-Day MA':<{quarter_w}}{'200-Day MA':<{quarter_w}}{'Recent':<{quarter_w}}{'Next':<{quarter_w}}"
+    row2 = f"${fifty_MA:<{quarter_w - 1}}${twoH_MA:<{quarter_w - 1}}{recent.replace('_', ' ').title():<{quarter_w}}{next.replace('_', ' ').title():<{quarter_w}}\n"
+    print(row1)
+    print(row2)
 
 
 def print_trend_message(trend):
@@ -260,20 +289,14 @@ def print_volume_message(volume_confirmation: str):
     )
 
 
-def print_MA_cross(recent, next):
-    print("MA Cross:")
-    print(f"{'Recent':<7}- {recent.replace('_', ' ').title():<25}")
-    print(f"{'Next':<7}- {next.replace('_', ' ').title():<25}\n")
-
-
 def print_expert_ratings(pct):
     print("Experts Ratings:")
     buy_bar = "■" * (pct[0] // 2) + "□" * (50 - (pct[0] // 2))
     hold_bar = "■" * (pct[1] // 2) + "□" * (50 - (pct[1] // 2))
     sell_bar = "■" * (pct[2] // 2) + "□" * (50 - (pct[2] // 2))
-    print(f"{pct[0]:>2}% {'Buy':<5}{buy_bar}")
-    print(f"{pct[1]:>2}% {'Hold':<5}{hold_bar}")
-    print(f"{pct[2]:>2}% {'Sell':<5}{sell_bar}")
+    print(f"{pct[0]:>3}% {'Buy':<5}{buy_bar}")
+    print(f"{pct[1]:>3}% {'Hold':<5}{hold_bar}")
+    print(f"{pct[2]:>3}% {'Sell':<5}{sell_bar}")
 
 
 def print_summary(score, outlook, confidence):
@@ -338,25 +361,29 @@ def print_summary_message(score, outlook, confidence):
 
 
 def print_stock_analysis(
+    recent,
+    next,
+    fifty_MA,
+    twoH_MA,
     trend,
     momentum,
     volume_confirmation,
-    recent,
-    next,
     recommendations_pct,
     score,
     outlook,
     confidence,
 ):
-    print("TECHNICAL ANALYSIS")
-    print("-" * 100)
+    global width
+    global quarter_w
+    print(f"{'TECHNICAL ANALYSIS':^{width}}")
+    print("-" * width)
+    print_MA_info(recent, next, fifty_MA, twoH_MA)
     print_trend_message(trend)
     print_momentum_message(momentum)
     print_volume_message(volume_confirmation)
-    print_MA_cross(recent, next)
     print_expert_ratings(recommendations_pct)
-    print("=" * 100)
-    print("SUMMARY")
-    print("-" * 100)
+    print("=" * width)
+    print(f"{'SUMMARY':^{width}}")
+    print("-" * width)
     print_summary(score, outlook, confidence)
-    print("=" * 100)
+    print("=" * width)
