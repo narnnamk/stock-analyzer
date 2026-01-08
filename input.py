@@ -90,5 +90,6 @@ def input_period(ticker):
             .lower()
         )
         period_check = is_valid_period(period, ticker)
+    print("-" * 100)
 
     return period

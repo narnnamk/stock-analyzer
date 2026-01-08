@@ -1,3 +1,12 @@
+import textwrap
+
+
+def wrap(text, width=72, indent=""):
+    return textwrap.fill(
+        text, width=width, initial_indent=indent, subsequent_indent=indent
+    )
+
+
 def print_welcome_message():
     print("-" * 100)
     print("Welcome to Stock Analyzer!")
@@ -62,27 +71,27 @@ def print_quick_overview(
     fifty_MA,
     twoH_MA,
 ):
+    print("\n\n\n")
     print("=" * 100)
     print("STOCK ANALYZER")
     print(f"Ticker: {ticker} | Period: {period}")
     print("=" * 100)
-    print("Quick Overview")
+    print("QUICK OVERVIEW")
     print("-" * 100)
-    print(f"Market Cap: {shorten_number(market_cap)}")
-    print(f"Company Size: {size.replace('_', ' ').title()}\n")
-    print(f"Current Price: ${price}")
-    print(
-        f"Change: {'+' if usd_change >= 0 else '-'}${abs(usd_change)} ({'+' if pct_change >= 0 else '-'}{abs(pct_change)}%)\n"
+    print(f"{'Current Price':<25}{'Market Cap':<25}")
+    print(f"${price:<24}{shorten_number(market_cap):<25}\n")
+    print(f"{'Period High':<25}{'Period Low':<25}")
+    print(f"${high:<24}${low:<24}\n")
+    print(f"{'Price Change':<25}{'Volatility':<25}")
+    change_str = (
+        f"{'+' if usd_change >= 0 else '-'}${abs(usd_change):.2f} ({pct_change:+.2f}%)"
     )
-    print(f"Volume: {shorten_number(curr_volume)}")
-    print(f"Average Volume: {shorten_number(avg_volume)}\n")
-    print(f"Period High: ${high}")
-    print(f"Period Low: ${low}")
-    print(
-        f"Volatility ({days}-Day): {volatility}% ({volatility_level.replace('_', ' ').title()})\n"
-    )
-    print(f"50-Day MA: ${fifty_MA}")
-    print(f"200-day MA: ${twoH_MA}")
+    volatility_str = f"{volatility}% ({volatility_level.replace('_', ' ').title()})"
+    print(f"{change_str:<25}{volatility_str:<25}\n")
+    print(f"{'Volume':<25}{'Average Volume':<25}")
+    print(f"{shorten_number(curr_volume):<25}{shorten_number(avg_volume):<25}\n")
+    print(f"{'50-Day MA':<25}{'200-Day MA':<25}")
+    print(f"${fifty_MA:<24}${twoH_MA:<24}")
     print("=" * 100)
 
 
@@ -253,20 +262,24 @@ def print_volume_message(volume_confirmation: str):
 
 def print_MA_cross(recent, next):
     print("MA Cross:")
-    print(f"Recent Cross: {recent.replace('_', ' ').title()}")
-    print(f"Next Cross: {next.replace('_', ' ').title()}\n")
+    print(f"{'Recent':<7}- {recent.replace('_', ' ').title():<25}")
+    print(f"{'Next':<7}- {next.replace('_', ' ').title():<25}\n")
 
 
 def print_expert_ratings(pct):
     print("Experts Ratings:")
-    print(f"Buy - {pct[0]}%\nHold - {pct[1]}%\nSell - {pct[2]}%")
+    buy_bar = "■" * (pct[0] // 2) + "□" * (50 - (pct[0] // 2))
+    hold_bar = "■" * (pct[1] // 2) + "□" * (50 - (pct[1] // 2))
+    sell_bar = "■" * (pct[2] // 2) + "□" * (50 - (pct[2] // 2))
+    print(f"{pct[0]:>2}% {'Buy':<5}{buy_bar}")
+    print(f"{pct[1]:>2}% {'Hold':<5}{hold_bar}")
+    print(f"{pct[2]:>2}% {'Sell':<5}{sell_bar}")
 
 
 def print_summary(score, outlook, confidence):
-    print("Summary:")
-    print(f"Signal Score: {score}/100")
-    print(f"Outlook: {outlook.replace('_', ' ').title()}")
-    print(f"Confidence: {confidence}\n")
+    print(f"{'Signal Score':<13}- {score}/100")
+    print(f"{'Outlook':<13}- {outlook.replace('_', ' ').title()}")
+    print(f"{'Confidence':<13}- {confidence}\n")
     print_summary_message(score, outlook, confidence)
 
 
@@ -321,7 +334,7 @@ def print_summary_message(score, outlook, confidence):
         f"{risk_line[confidence]}"
     )
 
-    return print(paragraph)
+    return print(wrap(paragraph, 95))
 
 
 def print_stock_analysis(
@@ -335,13 +348,15 @@ def print_stock_analysis(
     outlook,
     confidence,
 ):
-    print("Technical Analysis")
+    print("TECHNICAL ANALYSIS")
     print("-" * 100)
     print_trend_message(trend)
     print_momentum_message(momentum)
     print_volume_message(volume_confirmation)
     print_MA_cross(recent, next)
     print_expert_ratings(recommendations_pct)
+    print("=" * 100)
+    print("SUMMARY")
     print("-" * 100)
     print_summary(score, outlook, confidence)
     print("=" * 100)
