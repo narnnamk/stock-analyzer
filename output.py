@@ -46,7 +46,25 @@ def remove_decimals(num):
         return num
 
 
+# def shorten_number(num):
+#     units = [
+#         (1_000_000_000_000_000, "Q"),
+#         (1_000_000_000_000, "T"),
+#         (1_000_000_000, "B"),
+#         (1_000_000, "M"),
+#         (1_000, "K"),
+#     ]
+
+#     for value, suffix in units:
+#         if num >= value:
+#             num = f"{num / value:.2f}"
+#             return f"{remove_decimals(num)}{suffix}"
+
+
+#     return num
 def shorten_number(num):
+    sign = "-" if num < 0 else ""
+    num = abs(num)
     units = [
         (1_000_000_000_000_000, "Q"),
         (1_000_000_000_000, "T"),
@@ -58,9 +76,9 @@ def shorten_number(num):
     for value, suffix in units:
         if num >= value:
             num = f"{num / value:.2f}"
-            return f"{remove_decimals(num)}{suffix}"
+            return f"{sign}{remove_decimals(num)}{suffix}"
 
-    return num
+    return sign + str(num)
 
 
 def add_zero_to_price_decimals(price):

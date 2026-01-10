@@ -22,6 +22,19 @@ def get_x_ticks(days, dates):
     return indices, x_ticks
 
 
+def get_full_suffix(suffix):
+    if suffix == "K":
+        return "Thousand"
+    elif suffix == "M":
+        return "Million"
+    elif suffix == "B":
+        return "Billion"
+    elif suffix == "T":
+        return "Trillion"
+    else:
+        return "Quadrillion"
+
+
 # Price + Moving Averages (line chart)
 # Use: close_prices (series), fifty_MAs_list, two_hundred_MAs_list
 # Optional extras: horizontal lines for period_high and period_low
@@ -55,16 +68,7 @@ def plot_volumes(volumes, days, curr_vol, avg_vol, dates):
         )  # add abbrv form of volume e.g. 5.34M
 
     suffix = abbrv_volumes[0][-1]
-    if suffix == "K":
-        full_sf = "Thousand"
-    elif suffix == "M":
-        full_sf = "Million"
-    elif suffix == "B":
-        full_sf = "Billion"
-    elif suffix == "T":
-        full_sf = "Trillion"
-    else:
-        full_sf = "Quadrillion"
+    full_sf = get_full_suffix(suffix)
 
     no_suffix_abbrv_volumes = []
     for abbr_v in abbrv_volumes:
@@ -97,5 +101,14 @@ def plot_volumes(volumes, days, curr_vol, avg_vol, dates):
 # OBV line (good confirmation chart)
 # Use: OBVs_list
 # It’s useful when users want “is volume supporting the move?”
+def plot_OBVs(OBVs, days, dates):
+    plt.figure(figsize=(12, 6))
+    plt.title("On-Balance Volume")
+    plt.xlabel("Date (YYYY-MM-DD)")
+    plt.ylabel(f"OBV")
+    indices, x_ticks = get_x_ticks(days, dates)
+    plt.xticks(indices, x_ticks)
+    plt.plot(dates, OBVs)
+
 
 # Expert recommendations as horizontal bar chart

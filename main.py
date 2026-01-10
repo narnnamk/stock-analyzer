@@ -92,11 +92,13 @@ print_stock_analysis(
     confidence_level,
 )
 
-# plot_price_MAs(
-#     close_prices, days, dates_in_period, fifty_MAs_list, two_hundred_MAs_list
-# )
+plot_price_MAs(
+    close_prices, days, dates_in_period, fifty_MAs_list, two_hundred_MAs_list
+)
 
 plot_volumes(volumes, days, current_volume, avg_volume, dates_in_period)
+
+# plot_OBVs(OBVs_list, days, dates_in_period)
 
 plt.show()
 
