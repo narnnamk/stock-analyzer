@@ -88,7 +88,6 @@ def print_quick_overview(
     price = add_zero_to_price_decimals(price)
     high = add_zero_to_price_decimals(high)
     low = add_zero_to_price_decimals(low)
-    usd_change = add_zero_to_price_decimals(usd_change)
     print("\n\n\n")
     print("=" * width)
     print(f"{'STOCK ANALYZER':^{width}}")
@@ -107,7 +106,7 @@ def print_quick_overview(
 
     volume_label_row = f"{'Volume':<{quarter_w}}{'Average Volume':<{quarter_w}}{'Market Cap':<{quarter_w}}{'Volatility':<{quarter_w}}"
     volatility_str = f"{volatility}% ({volatility_level.replace('_', ' ').title()})"
-    volume_row = f"{shorten_number(curr_volume):<{quarter_w}}{shorten_number(avg_volume):<{quarter_w}}{shorten_number(market_cap):<{quarter_w}}{volatility_str:<{quarter_w}}\n"
+    volume_row = f"{shorten_number(curr_volume):<{quarter_w}}{shorten_number(avg_volume):<{quarter_w}}{shorten_number(market_cap):<{quarter_w}}{volatility_str:<{quarter_w}}"
     print(volume_label_row)
     print(volume_row)
 

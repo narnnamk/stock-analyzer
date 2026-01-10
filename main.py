@@ -13,30 +13,29 @@ period = input_period(ticker)
 
 stock = yf.Ticker(ticker)
 
+history = stock.history(period="max")
+
 days_in_period = {"1mo": 21, "3mo": 63, "6mo": 126, "1y": 252}
+days = days_in_period[period]
+
+dates_in_period = get_dates_in_period(history, days)
 
 current_price, open_prices, high_prices, low_prices, close_prices, volumes = (
-    get_history_data(stock)
+    get_history_data(stock, history)
 )
 
-usd_change, percent_change = get_price_changes(
-    current_price, close_prices, days_in_period[period]
-)
+usd_change, percent_change = get_price_changes(current_price, close_prices, days)
 
-volatility = get_volatility(close_prices, days_in_period[period])
+volatility = get_volatility(close_prices, days)
 
-fifty_MA, fifty_MAs_list = get_MAs(close_prices, days_in_period[period], 50)
-two_hundred_MA, two_hundred_MAs_list = get_MAs(
-    close_prices, days_in_period[period], 200
-)
+fifty_MA, fifty_MAs_list = get_MAs(close_prices, days, 50)
+two_hundred_MA, two_hundred_MAs_list = get_MAs(close_prices, days, 200)
 
 current_volume = volumes.iloc[-1]
-avg_volume = get_avg_volume(volumes, days_in_period[period])
-current_OBV, OBVs_list = get_OBVs(close_prices, volumes, days_in_period[period])
+avg_volume = get_avg_volume(volumes, days)
+current_OBV, OBVs_list = get_OBVs(close_prices, volumes, days)
 
-period_high, period_low = get_period_high_lows(
-    high_prices, low_prices, days_in_period[period]
-)
+period_high, period_low = get_period_high_lows(high_prices, low_prices, days)
 high_52wk, low_52wk = get_period_high_lows(
     high_prices, low_prices, days_in_period["1y"]
 )
@@ -53,9 +52,7 @@ company_size = get_company_size(market_cap)
 
 volatility_level = analyze_volatility(volatility, company_size)
 
-volume_confirmation = get_volume_confirmation(
-    OBVs_list, close_prices, days_in_period[period]
-)
+volume_confirmation = get_volume_confirmation(OBVs_list, close_prices, days)
 
 recent_cross = find_recent_cross(fifty_MAs_list, two_hundred_MAs_list)
 next_cross = predict_next_cross(fifty_MAs_list, two_hundred_MAs_list)
@@ -95,13 +92,20 @@ print_stock_analysis(
     confidence_level,
 )
 
+plot_price_MAs(
+    close_prices, days, dates_in_period, fifty_MAs_list, two_hundred_MAs_list
+)
+plt.show()
+
 
 # ---------------------------------------------------------------------------------------
 # variable.                 type        description
 # stock                     df          contains all yf library data about a stock given the ticker
 # ticker                    str         stock ticker
+# history                   df          history dataframe of the stock
 # period                    str         user picked timeframe e.g. 1mo
 # days_in_period            dict        key value pair of days in each period e.g. 1mo:30
+# dates_in_period           list        list of all trading dates in the period
 # current_price             flt         current stock market value
 # open_prices               df_col      historical open prices of stock
 # close_prices              df_col      historical close prices of stock
