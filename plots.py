@@ -61,6 +61,7 @@ def plot_volumes(volumes, days, curr_vol, avg_vol, dates):
     peak_vol = max(volumes)
     stats_text = f"{'Avg Volume':<12}: {shorten_number(avg_vol):>5}\n{'Peak Volume':<12}: {shorten_number(peak_vol):>5}\n{'Current':<12}: {shorten_number(curr_vol):>5}"
     avg_vol = float(shorten_number(avg_vol)[:-1])
+
     abbrv_volumes = []  # abbreviated volumes
     for volume in volumes:
         abbrv_volumes.append(
@@ -70,13 +71,15 @@ def plot_volumes(volumes, days, curr_vol, avg_vol, dates):
     suffix = abbrv_volumes[0][-1]
     full_sf = get_full_suffix(suffix)
 
-    no_suffix_abbrv_volumes = []
-    for abbr_v in abbrv_volumes:
-        no_suffix_abbrv_volumes.append(
-            float(abbr_v[: len(abbr_v) - 1])
-        )  # remove suffux and turn into float
+    no_sf_abbrv_volumes = []
+    for abbrv in abbrv_volumes:
+        if abbrv[-1] in ["K", "M", "B", "T", "Q"]:
+            no_sf_abbrv_volumes.append(float(abbrv[: len(abbrv) - 1]))
+        else:
+            no_sf_abbrv_volumes.append(float(abbrv))
 
-    volumes = no_suffix_abbrv_volumes
+    volumes = no_sf_abbrv_volumes
+
     plt.figure(figsize=(12, 6))
     plt.title("Volume")
     plt.xlabel("Date (YYYY-MM-DD)")
@@ -102,10 +105,26 @@ def plot_volumes(volumes, days, curr_vol, avg_vol, dates):
 # Use: OBVs_list
 # It’s useful when users want “is volume supporting the move?”
 def plot_OBVs(OBVs, days, dates):
+    abbrv_OBVs = []
+    for obv in OBVs:
+        abbrv_OBVs.append(shorten_number(obv))
+
+    suffix = abbrv_OBVs[0][-1]
+    full_sf = get_full_suffix(suffix)
+
+    no_sf_abbrv_OBVs = []
+    for abbrv in abbrv_OBVs:
+        if abbrv[-1] in ["K", "M", "B", "T", "Q"]:
+            no_sf_abbrv_OBVs.append(float(abbrv[: len(abbrv) - 1]))
+        else:
+            no_sf_abbrv_OBVs.append(float(abbrv))
+
+    OBVs = no_sf_abbrv_OBVs
+
     plt.figure(figsize=(12, 6))
     plt.title("On-Balance Volume")
     plt.xlabel("Date (YYYY-MM-DD)")
-    plt.ylabel(f"OBV")
+    plt.ylabel(f"OBV in {full_sf}")
     indices, x_ticks = get_x_ticks(days, dates)
     plt.xticks(indices, x_ticks)
     plt.plot(dates, OBVs)
