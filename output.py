@@ -291,7 +291,7 @@ def print_volume_message(volume_confirmation: str):
 
 
 def print_expert_ratings(pct):
-    print("Experts Ratings:")
+    print("Analysts Recommendations:")
     buy_bar = "■" * (pct[0] // 2) + "□" * (50 - (pct[0] // 2))
     hold_bar = "■" * (pct[1] // 2) + "□" * (50 - (pct[1] // 2))
     sell_bar = "■" * (pct[2] // 2) + "□" * (50 - (pct[2] // 2))

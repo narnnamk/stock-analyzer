@@ -131,3 +131,20 @@ def plot_OBVs(OBVs, days, dates):
 
 
 # Expert recommendations as horizontal bar chart
+
+
+def plot_expert_ratings(pct):
+    labels = ["Sell", "Hold", "Buy"]
+    values = [pct[2], pct[1], pct[0]]
+
+    plt.figure(figsize=(12, 6))
+    plt.title("Analyst Recommendations")
+
+    plt.barh(labels, values)
+    # plt.xlim(0, 100)
+    plt.xlabel("Percent")
+
+    for i, v in enumerate(values):  # label percent number next to the bar
+        plt.text(v + 1, i, f"{v:.0f}%")
+
+    # plt.tight_layout()

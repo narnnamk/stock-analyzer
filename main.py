@@ -100,6 +100,8 @@ print_stock_analysis(
 
 # plot_OBVs(OBVs_list, days, dates_in_period)
 
+plot_expert_ratings(recommendations_pct)
+
 plt.show()
 
 
