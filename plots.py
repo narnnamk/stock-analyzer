@@ -52,6 +52,23 @@ def plot_price_MAs(closes, days, dates, fifty_MAs, twoH_MAs):
     plt.legend(loc="best")
 
 
+def get_abbrv_sf(list):
+    abbrv_list = []  # abbreviated volumes
+    for item in list:
+        abbrv_list.append(shorten_number(item))  # add abbrv form of volume e.g. 5.34M
+
+    suffix = abbrv_list[-1][-1]
+    full_sf = get_full_suffix(suffix)
+
+    no_sf_abbrv = []
+    for abbrv in abbrv_list:
+        if abbrv[-1] in ["K", "M", "B", "T", "Q"]:
+            no_sf_abbrv.append(float(abbrv[: len(abbrv) - 1]))
+        else:
+            no_sf_abbrv.append(float(abbrv))
+    return no_sf_abbrv, full_sf
+
+
 # Volume bars + Avg volume line (best volume chart)
 # Use: volumes (series), avg_volume (single number)
 # Plot volume as bars.
@@ -61,24 +78,7 @@ def plot_volumes(volumes, days, curr_vol, avg_vol, dates):
     peak_vol = max(volumes)
     stats_text = f"{'Avg Volume':<12}: {shorten_number(avg_vol):>5}\n{'Peak Volume':<12}: {shorten_number(peak_vol):>5}\n{'Current':<12}: {shorten_number(curr_vol):>5}"
     avg_vol = float(shorten_number(avg_vol)[:-1])
-
-    abbrv_volumes = []  # abbreviated volumes
-    for volume in volumes:
-        abbrv_volumes.append(
-            shorten_number(volume)
-        )  # add abbrv form of volume e.g. 5.34M
-
-    suffix = abbrv_volumes[0][-1]
-    full_sf = get_full_suffix(suffix)
-
-    no_sf_abbrv_volumes = []
-    for abbrv in abbrv_volumes:
-        if abbrv[-1] in ["K", "M", "B", "T", "Q"]:
-            no_sf_abbrv_volumes.append(float(abbrv[: len(abbrv) - 1]))
-        else:
-            no_sf_abbrv_volumes.append(float(abbrv))
-
-    volumes = no_sf_abbrv_volumes
+    volumes, full_sf = get_abbrv_sf(volumes)
 
     plt.figure(figsize=(12, 6))
     plt.title("Volume")
@@ -105,21 +105,7 @@ def plot_volumes(volumes, days, curr_vol, avg_vol, dates):
 # Use: OBVs_list
 # It’s useful when users want “is volume supporting the move?”
 def plot_OBVs(OBVs, days, dates):
-    abbrv_OBVs = []
-    for obv in OBVs:
-        abbrv_OBVs.append(shorten_number(obv))
-
-    suffix = abbrv_OBVs[0][-1]
-    full_sf = get_full_suffix(suffix)
-
-    no_sf_abbrv_OBVs = []
-    for abbrv in abbrv_OBVs:
-        if abbrv[-1] in ["K", "M", "B", "T", "Q"]:
-            no_sf_abbrv_OBVs.append(float(abbrv[: len(abbrv) - 1]))
-        else:
-            no_sf_abbrv_OBVs.append(float(abbrv))
-
-    OBVs = no_sf_abbrv_OBVs
+    OBVs, full_sf = get_abbrv_sf(OBVs)
 
     plt.figure(figsize=(12, 6))
     plt.title("On-Balance Volume")
@@ -131,9 +117,7 @@ def plot_OBVs(OBVs, days, dates):
 
 
 # Expert recommendations as horizontal bar chart
-
-
-def plot_expert_ratings(pct):
+def plot_analyst_recommendations(pct):
     labels = ["Sell", "Hold", "Buy"]
     values = [pct[2], pct[1], pct[0]]
 
