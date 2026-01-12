@@ -33,7 +33,7 @@ two_hundred_MA, two_hundred_MAs_list = get_MAs(close_prices, days, 200)
 
 current_volume = volumes.iloc[-1]
 avg_volume = get_avg_volume(volumes, days)
-current_OBV, OBVs_list = get_OBVs(close_prices, volumes, days)
+current_OBV, OBVs_list, volume_colors = get_OBVs(close_prices, volumes, days)
 
 period_high, period_low = get_period_high_lows(high_prices, low_prices, days)
 high_52wk, low_52wk = get_period_high_lows(
@@ -102,6 +102,7 @@ plot_all_charts(
     volumes,
     current_volume,
     avg_volume,
+    volume_colors,
     OBVs_list,
     recommendations_pct,
 )
@@ -129,6 +130,7 @@ plot_all_charts(
 # avg_volume                int         average volume over the period
 # current_OBV               int         current on balance volume
 # OBVs_list                 list        list of on balance volume of the days in period
+# volume_colors             list        list of colors according to closing price compared to previous days.
 # period_high               flt         highest stock price from the period
 # period_low                flt         lowest stock price from the period
 # recommendations           dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell

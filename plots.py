@@ -4,16 +4,16 @@ from output import shorten_number
 
 
 def get_x_ticks(days, dates):
-    if days == 21:  # 1mo
+    if days == 21:
         step = 5
         x_ticks = dates[::step]
-    elif days == 63:  # 3mo
+    elif days == 63:
         step = 13
         x_ticks = [d[2:] for d in dates[::step]]
-    elif days == 126:  # 6mo
+    elif days == 126:
         step = 21
         x_ticks = [d[:7] for d in dates[::step]]
-    else:  # 1y
+    else:
         step = 42
         x_ticks = [d[:7] for d in dates[::step]]
 
@@ -60,19 +60,19 @@ def plot_price_MAs(ax, closes, days, dates, fifty_MAs, twoH_MAs):
     ax.set_ylabel("Close Price (USD)")
     indices, x_ticks = get_x_ticks(days, dates)
     ax.set_xticks(indices, x_ticks)
-    ax.plot(dates, closes, label="Close Prices")
-    ax.plot(dates, fifty_MAs, label="50-Day MA")
-    ax.plot(dates, twoH_MAs, label="200-Day MA")
-    ax.legend(loc="upper right")
+    ax.plot(dates, closes, label="Close Prices", color="#555555")
+    ax.plot(dates, fifty_MAs, label="50-Day MA", color="#feab3e")
+    ax.plot(dates, twoH_MAs, label="200-Day MA", color="#538be4")
+    ax.legend(loc="upper left", prop={"family": "monospace", "size": 9})
     ax.set_xlim(0, days - 1)
     ax.grid(True, alpha=0.7, linestyle=":", linewidth=0.5)
     ax.set_axisbelow(True)
 
 
 def get_abbrv_sf(list):
-    abbrv_list = []  # abbreviated volumes
+    abbrv_list = []
     for item in list:
-        abbrv_list.append(shorten_number(item))  # add abbrv form of volume e.g. 5.34M
+        abbrv_list.append(shorten_number(item))
 
     suffix = abbrv_list[-1][-1]
     full_sf = get_full_suffix(suffix)
@@ -86,7 +86,7 @@ def get_abbrv_sf(list):
     return no_sf_abbrv, full_sf
 
 
-def plot_volumes(ax, volumes, days, curr_vol, avg_vol, dates):
+def plot_volumes(ax, volumes, days, curr_vol, avg_vol, dates, colors):
     volumes = list(volumes.tail(days))
     peak_vol = max(volumes)
     stats_text = f"{'Avg Volume':<12}: {shorten_number(avg_vol):>5}\n{'Peak Volume':<12}: {shorten_number(peak_vol):>5}\n{'Current':<12}: {shorten_number(curr_vol):>5}"
@@ -98,23 +98,24 @@ def plot_volumes(ax, volumes, days, curr_vol, avg_vol, dates):
     ax.set_xlabel(f"Date ({date_form})")
     ax.set_ylabel(f"Volume ({full_sf})")
     ax.text(
-        0.98,
+        0.02,
         0.96,
         stats_text,
         transform=ax.transAxes,
         fontsize=9,
         fontfamily="monospace",
         verticalalignment="top",
-        horizontalalignment="right",
+        horizontalalignment="left",
         bbox=dict(
             boxstyle="round", facecolor="white", alpha=0.9, edgecolor="lightgrey"
         ),
     )
     indices, x_ticks = get_x_ticks(days, dates)
     ax.set_xticks(indices, x_ticks)
-    colors = [""]
-    ax.bar(dates, volumes)
-    ax.axhline(y=avg_vol, linestyle="-", linewidth=1, alpha=0.8)
+    edge_c = ["grey" if days == 21 or days == 63 else "none"]
+    line_w = [0.7 if days == 21 else 0.3 if days == 63 else None]
+    ax.bar(dates, volumes, color=colors, edgecolor=edge_c, linewidth=line_w)
+    ax.axhline(y=avg_vol, linestyle="--", linewidth=1, alpha=1, color="#555555")
     ax.set_xlim(0, days - 1)
     ax.grid(True, alpha=0.7, linestyle=":", linewidth=0.5)
     ax.set_axisbelow(True)
@@ -130,7 +131,7 @@ def plot_OBVs(ax, OBVs, days, dates):
     ax.set_ylabel(f"OBV ({full_sf})")
     indices, x_ticks = get_x_ticks(days, dates)
     ax.set_xticks(indices, x_ticks)
-    ax.plot(dates, OBVs, color="#8793E4")
+    ax.plot(dates, OBVs, color="#BB72DA")
     ax.set_xlim(0, days - 1)
     ax.grid(True, alpha=0.7, linestyle=":", linewidth=0.5)
     ax.set_axisbelow(True)
@@ -149,8 +150,8 @@ def plot_analyst_recommendations(ax, pct):
     ax.grid(True, alpha=0.7, linestyle=":", linewidth=0.5)
     ax.set_axisbelow(True)
 
-    for i, v in enumerate(values):  # label percent number next to the bar
-        ax.text((v - 9 if v >= 10 else v + 3), i - 0.07, f"{v}%", size=10)
+    for i, v in enumerate(values):
+        ax.text((v - 9 if v >= 10 else v + 3), i - 0.06, f"{v}%", size=9)
 
 
 def plot_all_charts(
@@ -163,13 +164,14 @@ def plot_all_charts(
     volumes,
     curr_vol,
     avg_vol,
+    vol_colors,
     OBVs,
     pct,
 ):
     fig, axs = plt.subplots(2, 2, figsize=(12, 7))
 
     plot_price_MAs(axs[0, 0], closes, days, dates, fifty_MAs, twoH_MAs)
-    plot_volumes(axs[0, 1], volumes, days, curr_vol, avg_vol, dates)
+    plot_volumes(axs[0, 1], volumes, days, curr_vol, avg_vol, dates, vol_colors)
     plot_analyst_recommendations(axs[1, 0], pct)
     plot_OBVs(axs[1, 1], OBVs, days, dates)
 

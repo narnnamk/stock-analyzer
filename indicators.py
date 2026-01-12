@@ -32,16 +32,21 @@ def get_OBVs(closes, volumes, days):
     volumes = volumes.tail(days)
 
     OBVs = [0]
+    colors = ["#E48A8AFF", "#FDEEBF", "#BDDDBF"]
+    volume_colors = [colors[1]]
 
     for i in range(1, days):
         if prices.iloc[i] > prices.iloc[i - 1]:
             OBVs.append(OBVs[-1] + volumes.iloc[i])
+            volume_colors.append(colors[2])
         elif prices.iloc[i] < prices.iloc[i - 1]:
             OBVs.append(OBVs[-1] - volumes.iloc[i])
+            volume_colors.append(colors[0])
         else:
             OBVs.append(OBVs[-1])
+            volume_colors.append(colors[1])
 
-    return OBVs[-1], OBVs
+    return OBVs[-1], OBVs, volume_colors
 
 
 def get_period_high_lows(highs, lows, days):
