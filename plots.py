@@ -6,20 +6,37 @@ from output import shorten_number
 def get_x_ticks(days, dates):
     if days == 21:  # 1mo
         step = 5
+        x_ticks = dates[::step]
     elif days == 63:  # 3mo
         step = 13
+        x_ticks = [d[2:] for d in dates[::step]]
     elif days == 126:  # 6mo
         step = 21
+        x_ticks = [d[:7] for d in dates[::step]]
     else:  # 1y
         step = 42
+        x_ticks = [d[:7] for d in dates[::step]]
 
     indices = list(range(0, days, step))
-    x_ticks = dates[::step]
     if indices[-1] != days - 1:
         indices += [days - 1]
-        x_ticks += [dates[-1]]
+        if days == 21:
+            x_ticks += [dates[-1]]
+        elif days == 63:
+            x_ticks += [dates[-1][2:]]
+        else:
+            x_ticks += [dates[-1][:7]]
 
     return indices, x_ticks
+
+
+def get_date_form(days):
+    if days == 21:
+        return "YYYY-MM-DD"
+    elif days == 63:
+        return "YY-MM-DD"
+    else:
+        return "YYYY-MM"
 
 
 def get_full_suffix(suffix):
@@ -35,21 +52,21 @@ def get_full_suffix(suffix):
         return "Quadrillion"
 
 
-# Price + Moving Averages (line chart)
-# Use: close_prices (series), fifty_MAs_list, two_hundred_MAs_list
-# Optional extras: horizontal lines for period_high and period_low
-def plot_price_MAs(closes, days, dates, fifty_MAs, twoH_MAs):
+def plot_price_MAs(ax, closes, days, dates, fifty_MAs, twoH_MAs):
     closes = closes.tail(days)
-    plt.figure(figsize=(12, 6))
-    plt.title("Close Price with 50/200-Day MA")
-    plt.xlabel("Date (YYYY-MM-DD)")
-    plt.ylabel("Close Price (USD)")
+    ax.set_title("Close Price with 50/200-Day MA")
+    date_form = get_date_form(days)
+    ax.set_xlabel(f"Date ({date_form})")
+    ax.set_ylabel("Close Price (USD)")
     indices, x_ticks = get_x_ticks(days, dates)
-    plt.xticks(indices, x_ticks)
-    plt.plot(dates, closes, label="Close Prices")
-    plt.plot(dates, fifty_MAs, label="50-Day MA")
-    plt.plot(dates, twoH_MAs, label="200-Day MA")
-    plt.legend(loc="best")
+    ax.set_xticks(indices, x_ticks)
+    ax.plot(dates, closes, label="Close Prices")
+    ax.plot(dates, fifty_MAs, label="50-Day MA")
+    ax.plot(dates, twoH_MAs, label="200-Day MA")
+    ax.legend(loc="upper right")
+    ax.set_xlim(0, days - 1)
+    ax.grid(True, alpha=0.7, linestyle=":", linewidth=0.5)
+    ax.set_axisbelow(True)
 
 
 def get_abbrv_sf(list):
@@ -69,66 +86,94 @@ def get_abbrv_sf(list):
     return no_sf_abbrv, full_sf
 
 
-# Volume bars + Avg volume line (best volume chart)
-# Use: volumes (series), avg_volume (single number)
-# Plot volume as bars.
-# Plot a flat line at avg_volume across the whole period.
-def plot_volumes(volumes, days, curr_vol, avg_vol, dates):
+def plot_volumes(ax, volumes, days, curr_vol, avg_vol, dates):
     volumes = list(volumes.tail(days))
     peak_vol = max(volumes)
     stats_text = f"{'Avg Volume':<12}: {shorten_number(avg_vol):>5}\n{'Peak Volume':<12}: {shorten_number(peak_vol):>5}\n{'Current':<12}: {shorten_number(curr_vol):>5}"
     avg_vol = float(shorten_number(avg_vol)[:-1])
     volumes, full_sf = get_abbrv_sf(volumes)
 
-    plt.figure(figsize=(12, 6))
-    plt.title("Volume")
-    plt.xlabel("Date (YYYY-MM-DD)")
-    plt.ylabel(f"Volume in {full_sf}")
-    plt.text(
-        0.99,
+    ax.set_title("Volume")
+    date_form = get_date_form(days)
+    ax.set_xlabel(f"Date ({date_form})")
+    ax.set_ylabel(f"Volume ({full_sf})")
+    ax.text(
         0.98,
+        0.96,
         stats_text,
-        transform=plt.gca().transAxes,
+        transform=ax.transAxes,
         fontsize=9,
         fontfamily="monospace",
         verticalalignment="top",
         horizontalalignment="right",
-        bbox=dict(boxstyle="round", facecolor="lightblue", alpha=0.7),
+        bbox=dict(
+            boxstyle="round", facecolor="white", alpha=0.9, edgecolor="lightgrey"
+        ),
     )
     indices, x_ticks = get_x_ticks(days, dates)
-    plt.xticks(indices, x_ticks)
-    plt.bar(dates, volumes)
-    plt.axhline(y=avg_vol, linestyle="--", linewidth=1)
+    ax.set_xticks(indices, x_ticks)
+    colors = [""]
+    ax.bar(dates, volumes)
+    ax.axhline(y=avg_vol, linestyle="-", linewidth=1, alpha=0.8)
+    ax.set_xlim(0, days - 1)
+    ax.grid(True, alpha=0.7, linestyle=":", linewidth=0.5)
+    ax.set_axisbelow(True)
 
 
-# OBV line (good confirmation chart)
-# Use: OBVs_list
-# It’s useful when users want “is volume supporting the move?”
-def plot_OBVs(OBVs, days, dates):
+def plot_OBVs(ax, OBVs, days, dates):
+    print(f"days={days}, len(dates)={len(dates)}, len(OBVs)={len(OBVs)}")
     OBVs, full_sf = get_abbrv_sf(OBVs)
 
-    plt.figure(figsize=(12, 6))
-    plt.title("On-Balance Volume")
-    plt.xlabel("Date (YYYY-MM-DD)")
-    plt.ylabel(f"OBV in {full_sf}")
+    ax.set_title("On-Balance Volume")
+    date_form = get_date_form(days)
+    ax.set_xlabel(f"Date ({date_form})")
+    ax.set_ylabel(f"OBV ({full_sf})")
     indices, x_ticks = get_x_ticks(days, dates)
-    plt.xticks(indices, x_ticks)
-    plt.plot(dates, OBVs)
+    ax.set_xticks(indices, x_ticks)
+    ax.plot(dates, OBVs, color="#8793E4")
+    ax.set_xlim(0, days - 1)
+    ax.grid(True, alpha=0.7, linestyle=":", linewidth=0.5)
+    ax.set_axisbelow(True)
 
 
-# Expert recommendations as horizontal bar chart
-def plot_analyst_recommendations(pct):
+def plot_analyst_recommendations(ax, pct):
     labels = ["Sell", "Hold", "Buy"]
     values = [pct[2], pct[1], pct[0]]
+    colors = ["#E48A8AFF", "#FDEEBF", "#BDDDBF"]
 
-    plt.figure(figsize=(12, 6))
-    plt.title("Analyst Recommendations")
-
-    plt.barh(labels, values)
-    # plt.xlim(0, 100)
-    plt.xlabel("Percent")
+    ax.set_title("Analyst Recommendations")
+    ax.barh(labels, values, color=colors, edgecolor="black", linewidth=1)
+    plt.xlim(0, 100)
+    ax.set_xlabel("Percent")
+    ax.set_xlim(0, 100)
+    ax.grid(True, alpha=0.7, linestyle=":", linewidth=0.5)
+    ax.set_axisbelow(True)
 
     for i, v in enumerate(values):  # label percent number next to the bar
-        plt.text(v + 1, i, f"{v:.0f}%")
+        ax.text((v - 9 if v >= 10 else v + 3), i - 0.07, f"{v}%", size=10)
 
-    # plt.tight_layout()
+
+def plot_all_charts(
+    ticker,
+    closes,
+    days,
+    dates,
+    fifty_MAs,
+    twoH_MAs,
+    volumes,
+    curr_vol,
+    avg_vol,
+    OBVs,
+    pct,
+):
+    fig, axs = plt.subplots(2, 2, figsize=(12, 7))
+
+    plot_price_MAs(axs[0, 0], closes, days, dates, fifty_MAs, twoH_MAs)
+    plot_volumes(axs[0, 1], volumes, days, curr_vol, avg_vol, dates)
+    plot_analyst_recommendations(axs[1, 0], pct)
+    plot_OBVs(axs[1, 1], OBVs, days, dates)
+
+    fig.suptitle(f"{ticker} Charts", fontsize=14)
+    plt.tight_layout()
+    plt.show()
+    # plt.savefig(f"{ticker}_charts.jpg", dpi=300, bbox_inches="tight")
