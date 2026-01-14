@@ -1,18 +1,11 @@
 import textwrap
-
-width = 100
-quarter_w = 100 // 4
-
-
-def wrap(text, width=72, indent=""):
-    return textwrap.fill(
-        text, width=width, initial_indent=indent, subsequent_indent=indent
-    )
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 
 
 def print_welcome_message():
-    global width
-    print("\n\n\n")
+    width = 100
+    print("\n")
     print("=" * width)
     print("Welcome to Stock Analyzer!")
     print("-" * width)
@@ -71,243 +64,148 @@ def add_zero_to_price_decimals(price):
     return price
 
 
-def print_quick_overview(
-    ticker,
-    period,
-    market_cap,
-    price,
-    usd_change,
-    pct_change,
-    curr_volume,
-    avg_volume,
-    high,
-    low,
-    volatility,
-    volatility_level,
-):
-    global width
-    global quarter_w
-    price = add_zero_to_price_decimals(price)
-    high = add_zero_to_price_decimals(high)
-    low = add_zero_to_price_decimals(low)
-    print("\n\n\n")
-    print("=" * width)
-    print(f"{'STOCK ANALYZER':^{width}}")
-    ticker_row = f"Ticker: {ticker} | Period: {period}"
-    print(f"{ticker_row:^{width}}")
-    print("=" * width)
-    print(f"{'QUICK OVERVIEW':^{width}}")
-    print("-" * width)
-    price_label_row = f"{'Current Price':<{quarter_w}}{'Period High':<{quarter_w}}{'Period Low':<{quarter_w}}{'Price Change':<{quarter_w}}"
-    change_str = (
-        f"{'+' if usd_change >= 0 else '-'}${abs(usd_change):.2f} ({pct_change:+.2f}%)"
-    )
-    price_row = f"${price:<{quarter_w - 1}}${high:<{quarter_w - 1}}${low:<{quarter_w - 1}}{change_str:<{quarter_w}}\n"
-    print(price_label_row)
-    print(price_row)
-
-    volume_label_row = f"{'Volume':<{quarter_w}}{'Average Volume':<{quarter_w}}{'Market Cap':<{quarter_w}}{'Volatility':<{quarter_w}}"
-    volatility_str = f"{volatility}% ({volatility_level.replace('_', ' ').title()})"
-    volume_row = f"{shorten_number(curr_volume):<{quarter_w}}{shorten_number(avg_volume):<{quarter_w}}{shorten_number(market_cap):<{quarter_w}}{volatility_str:<{quarter_w}}"
-    print(volume_label_row)
-    print(volume_row)
-
-    print("=" * width)
-
-
-def print_MA_info(recent, next, fifty_MA, twoH_MA):
-    global quarter_w
-    fifty_MA = add_zero_to_price_decimals(fifty_MA)
-    twoH_MA = add_zero_to_price_decimals(twoH_MA)
-    row1 = f"{'50-Day MA':<{quarter_w}}{'200-Day MA':<{quarter_w}}{'Recent':<{quarter_w}}{'Next':<{quarter_w}}"
-    row2 = f"${fifty_MA:<{quarter_w - 1}}${twoH_MA:<{quarter_w - 1}}{recent.replace('_', ' ').title():<{quarter_w}}{next.replace('_', ' ').title():<{quarter_w}}\n"
-    print(row1)
-    print(row2)
-
-
-def print_trend_message(trend):
+def get_trend_message(trend):
     messages = {
         "strong_bullish": (
-            "STRONG BULLISH - "
-            "Price is above both the 50-day MA and 200-day MA.\n"
-            "That usually signals strong upward structure and healthy momentum.\n"
+            "Price is above both the 50-day MA and 200-day MA. "
+            "That usually signals strong upward structure and healthy momentum. "
             "As long as price holds above the 50-day MA, the trend remains in control."
         ),
         "weak_bullish": (
-            "WEAK BULLISH - "
-            "Price is below the 50-day MA, but still above the 200-day MA.\n"
-            "This often happens during a pullback inside a bigger uptrend.\n"
+            "Price is below the 50-day MA, but still above the 200-day MA. "
+            "This often happens during a pullback inside a bigger uptrend. "
             "A move back above the 50-day MA would strengthen the bullish case."
         ),
         "transitional": (
-            "TRANSITIONAL - "
-            "Price is above the 50-day MA, but still below the 200-day MA.\n"
-            "That can signal an early recovery attempt, but the long-term trend is not confirmed.\n"
+            "Price is above the 50-day MA, but still below the 200-day MA. "
+            "That can signal an early recovery attempt, but the long-term trend is not confirmed. "
             "Breaking and holding above the 200-day MA would be a stronger trend shift."
         ),
         "bear_rally": (
-            "BEAR RALLY - "
-            "Price is above the 200-day MA, but the 200-day MA is also sitting above the 50-day MA.\n"
-            "That means price has bounced, but the medium-term trend is still lagging behind.\n"
+            "Price is above the 200-day MA, but the 200-day MA is also sitting above the 50-day MA. "
+            "That means price has bounced, but the medium-term trend is still lagging behind. "
             "If the 50-day MA starts rising back above the 200-day MA, the trend improves."
         ),
         "late_bearish": (
-            "LATE BEARISH - "
-            "Both moving averages are above price, with the 200-day MA above the 50-day MA.\n"
-            "That usually points to a longer-term downtrend that is still in control.\n"
+            "Both moving averages are above price, with the 200-day MA above the 50-day MA. "
+            "That usually points to a longer-term downtrend that is still in control. "
             "A sustained move back above the 50-day MA would be the first sign of improvement."
         ),
         "strong_bearish": (
-            "STRONG BEARISH - "
-            "The 50-day MA is above the 200-day MA, and both are above price.\n"
-            "That often signals strong downside pressure and aggressive selling phases.\n"
+            "The 50-day MA is above the 200-day MA, and both are above price. "
+            "That often signals strong downside pressure and aggressive selling phases. "
             "Price would need to reclaim the 200-day MA to reduce the bearish outlook."
         ),
         "neutral": (
-            "NEUTRAL - "
-            "Price and the 50/200-day MAs are not in a clean bullish or bearish structure.\n"
-            "This can happen during sideways markets or choppy transitions.\n"
-            "Waiting for a clearer alignment can help avoid false signals."
+            "Price and the 50/200-day MAs are not in a clean bullish or bearish structure. "
+            "This can happen during sideways markets or choppy transitions. "
+            "Waiting for a clearer alignment can help avoid false signals. "
         ),
     }
 
-    return print(f"Trend:\n{messages[trend]}\n")
+    return messages[trend]
 
 
-def print_momentum_message(momentum):
+def get_momentum_message(momentum):
     messages = {
         "strong_buy": (
-            "STRONG BUY - "
-            "The percent gain for this period is high, and price is trading near the top of its range.\n"
-            "That usually means buyers are in control and the move has strength.\n"
+            "The percent gain for this period is high, and price is trading near the top of its range. "
+            "That usually means buyers are in control and the move has strength. "
             "Be careful with sudden pullbacks after strong runs."
         ),
         "moderate_buy": (
-            "MODERATE BUY - "
-            "The percent gain is solid for the period, and price is in the upper part of the range.\n"
-            "This suggests steady buying pressure and healthy trend continuation.\n"
+            "The percent gain is solid for the period, and price is in the upper part of the range. "
+            "This suggests steady buying pressure and healthy trend continuation. "
             "Holding in the upper range keeps the momentum strong."
         ),
         "bounce_attempt": (
-            "BOUNCE ATTEMPT - "
-            "The period return is positive, but price is still close to the lower part of the range.\n"
-            "That can happen when a stock is trying to recover after weakness.\n"
+            "The period return is positive, but price is still close to the lower part of the range. "
+            "That can happen when a stock is trying to recover after weakness. "
             "A push toward the middle or upper range would confirm stronger momentum."
         ),
         "consolidation": (
-            "CONSOLIDATION - "
-            "Price is sitting around the middle of the range without a strong percent move.\n"
-            "This often means the market is undecided right now.\n"
+            "Price is sitting around the middle of the range without a strong percent move. "
+            "This often means the market is undecided right now. "
             "A break out of the range is usually the next important signal."
         ),
         "weak_sell": (
-            "WEAK SELL - "
-            "The period return is negative and price is sitting in the lower part of its range.\n"
-            "Sellers have an advantage, but it does not look like a full breakdown yet.\n"
+            "The period return is negative and price is sitting in the lower part of its range. "
+            "Sellers have an advantage, but it does not look like a full breakdown yet. "
             "A recovery back toward the mid-range would improve the signal."
         ),
         "strong_sell": (
-            "STRONG SELL - "
-            "The percent drop for this period is large, and price is near the bottom of its range.\n"
-            "This often signals strong selling pressure and weak demand.\n"
+            "The percent drop for this period is large, and price is near the bottom of its range. "
+            "This often signals strong selling pressure and weak demand. "
             "It usually takes a strong reversal to shift this momentum."
         ),
         "mixed_signal": (
-            "MIXED SIGNAL - "
-            "The percent change and the range position do not line up into a strong setup.\n"
-            "This can happen in choppy markets where price swings both ways.\n"
+            "The percent change and the range position do not line up into a strong setup. "
+            "This can happen in choppy markets where price swings both ways. "
             "Waiting for a cleaner signal may reduce false entries."
         ),
         "no_movement": (
-            "NO MOVEMENT - "
-            "The high and low are the same, so the range is flat.\n"
-            "This can happen with very low volume or limited data.\n"
+            "The high and low are the same, so the range is flat. "
+            "This can happen with very low volume or limited data. "
             "Momentum cannot be judged reliably in this situation."
         ),
     }
 
-    return print(f"Momentum:\n{messages[momentum]}\n")
+    return messages[momentum]
 
 
-def print_volume_message(volume_confirmation: str):
+def get_volume_message(volume_confirmation: str):
     messages = {
         "bullish_confirm": (
-            "BULLISH CONFIRM - Volume confirms the bullish move.\n"
-            "Price has been trending up and OBV is also rising.\n"
+            "Volume confirms the bullish move. "
+            "Price has been trending up and OBV is also rising. "
             "That usually means buying pressure is supporting the uptrend."
         ),
         "bearish_confirm": (
-            "BEARISH CONFIRM - Volume confirms the bearish move.\n"
-            "Price has been trending down and OBV is also falling.\n"
+            "Volume confirms the bearish move. "
+            "Price has been trending down and OBV is also falling. "
             "That usually means selling pressure is supporting the downtrend."
         ),
         "bearish_divergence": (
-            "BEARISH DIVERGENCE - "
-            "Price is moving up, but OBV is moving down.\n"
-            "That can mean the rally is not supported by real buying pressure.\n"
+            "Price is moving up, but OBV is moving down. "
+            "That can mean the rally is not supported by real buying pressure. "
             "Be cautious, because this setup can lead to pullbacks or reversals."
         ),
         "bullish_divergence": (
-            "BULLISH DIVERGENCE - "
-            "Price is moving down, but OBV is moving up.\n"
-            "That can mean buyers are quietly stepping in while price is still weak.\n"
+            "Price is moving down, but OBV is moving up. "
+            "That can mean buyers are quietly stepping in while price is still weak. "
             "If price stabilizes, this can be an early reversal clue."
         ),
         "accumulation": (
-            "ACCUMULATION - "
-            "Price is mostly flat, but OBV is trending up.\n"
-            "That can mean investors are buying in the background without moving price much.\n"
+            "Price is mostly flat, but OBV is trending up. "
+            "That can mean investors are buying in the background without moving price much. "
             "A breakout is more likely if this accumulation continues."
         ),
         "distribution": (
-            "DISTRIBUTION - "
-            "Price is mostly flat, but OBV is trending down.\n"
-            "That can mean selling is happening quietly while price still looks stable.\n"
+            "Price is mostly flat, but OBV is trending down. "
+            "That can mean selling is happening quietly while price still looks stable. "
             "A breakdown is more likely if this distribution continues."
         ),
         "weak_bullish": (
-            "WEAK BULLISH - "
-            "Price is trending up, but OBV is mostly flat.\n"
-            "That can mean the move is drifting higher without strong demand.\n"
+            "Price is trending up, but OBV is mostly flat. "
+            "That can mean the move is drifting higher without strong demand. "
             "This trend can continue, but it is easier to fade if buyers do not step in."
         ),
         "weak_bearish": (
-            "WEAK BEARISH - "
-            "Price is trending down, but OBV is mostly flat.\n"
-            "That can mean the drop is happening without strong selling pressure.\n"
+            "Price is trending down, but OBV is mostly flat. "
+            "That can mean the drop is happening without strong selling pressure. "
             "This can turn into a bounce if buyers show up."
         ),
         "consolidation": (
-            "CONSOLIDATION - "
-            "Neither price nor OBV is showing a strong direction.\n"
-            "This often happens during consolidation and indecision.\n"
+            "Neither price nor OBV is showing a strong direction. "
+            "This often happens during consolidation and indecision. "
             "Waiting for a clear volume shift can help confirm the next move."
         ),
     }
 
-    return print(
-        f"Volume:\n{messages.get(volume_confirmation, 'Volume explanation is unavailable right now.')}\n"
-    )
+    return messages[volume_confirmation]
 
 
-def print_expert_ratings(pct):
-    print("Analysts Recommendations:")
-    buy_bar = "■" * (pct[0] // 2) + "□" * (50 - (pct[0] // 2))
-    hold_bar = "■" * (pct[1] // 2) + "□" * (50 - (pct[1] // 2))
-    sell_bar = "■" * (pct[2] // 2) + "□" * (50 - (pct[2] // 2))
-    print(f"{pct[0]:>3}% {'Buy':<5}{buy_bar}")
-    print(f"{pct[1]:>3}% {'Hold':<5}{hold_bar}")
-    print(f"{pct[2]:>3}% {'Sell':<5}{sell_bar}")
-
-
-def print_summary(score, outlook, confidence):
-    print(f"{'Signal Score':<13}: {score}/100")
-    print(f"{'Outlook':<13}: {outlook.replace('_', ' ').title()}")
-    print(f"{'Confidence':<13}: {confidence}\n")
-    print_summary_message(score, outlook, confidence)
-
-
-def print_summary_message(score, outlook, confidence):
+def get_summary_message(score, outlook, confidence):
     outlook_word = {
         "strong_bullish": "strongly bullish",
         "bullish": "bullish",
@@ -352,39 +250,191 @@ def print_summary_message(score, outlook, confidence):
 
     paragraph = (
         f"With a signal score of {score}/100, the overall setup looks {outlook_word[outlook]}. "
-        f"{outlook_line[outlook]}\n"
-        f"Confidence is {confidence_word[confidence]}, which means {confidence_line[confidence].lower()}\n"
-        f"{next_step_line[outlook]}\n"
+        f"{outlook_line[outlook]} "
+        f"Confidence is {confidence_word[confidence]}, which means {confidence_line[confidence].lower()} "
+        f"{next_step_line[outlook]} "
         f"{risk_line[confidence]}"
     )
 
-    return print(wrap(paragraph, 95))
+    return paragraph
 
 
-def print_stock_analysis(
-    recent,
-    next,
+def wrap_text(text):
+    return textwrap.wrap(text, width=84, break_long_words=False, break_on_hyphens=False)
+
+
+def get_report(
+    ticker,
+    name,
+    period,
+    usd_change,
+    pct_change,
+    price,
+    high,
+    low,
+    volatility,
+    volatility_level,
+    curr_volume,
+    avg_volume,
+    mkt_cap,
     fifty_MA,
     twoH_MA,
+    recent,
+    next,
     trend,
     momentum,
     volume_confirmation,
-    recommendations_pct,
     score,
     outlook,
     confidence,
 ):
-    global width
-    global quarter_w
-    print(f"{'TECHNICAL ANALYSIS':^{width}}")
-    print("-" * width)
-    print_MA_info(recent, next, fifty_MA, twoH_MA)
-    print_trend_message(trend)
-    print_momentum_message(momentum)
-    print_volume_message(volume_confirmation)
-    print_expert_ratings(recommendations_pct)
-    print("=" * width)
-    print(f"{'SUMMARY':^{width}}")
-    print("-" * width)
-    print_summary(score, outlook, confidence)
-    print("=" * width)
+    c = canvas.Canvas(f"{ticker}_Report.pdf", pagesize=A4)
+    w, h = A4
+
+    side_margin = 72
+    top_margin = 72
+    x = side_margin
+    y = h - top_margin
+
+    fontsize = 9
+    line_space = fontsize * 1.3
+
+    c.setFont("Courier", fontsize)
+
+    width_chars = 84
+    divider = "=" * width_chars
+    thin = "-" * width_chars
+
+    # Header
+    c.drawString(x, y, divider)
+    y -= line_space
+    first_row = f"{name.upper()} STOCK ANALYSIS REPORT"
+    c.drawString(x, y, f"{first_row:^84}")
+    y -= line_space
+    ticker_row = f"Ticker: {ticker} | Period: {period}"
+    c.drawString(x, y, f"{ticker_row:^84}")
+    y -= line_space
+    c.drawString(x, y, divider)
+    y -= line_space
+
+    # Quick Overview
+    c.drawString(x, y, f"{'QUICK OVERVIEW':^84}")
+    y -= line_space
+    c.drawString(x, y, thin)
+    y -= line_space
+
+    c.drawString(
+        x,
+        y,
+        f"{'Current Price':<21}{'Period High':<21}{'Period Low':<21}{'Price Change':<21}",
+    )
+    y -= line_space
+
+    change_str = f"{usd_change:+,.2f} ({pct_change:+.2f}%)"
+    price_row = f"${price:<20,.2f}${high:<20,.2f}${low:<20,.2f}{change_str:21}"
+    c.drawString(x, y, price_row)
+    y -= line_space
+    y -= line_space
+    c.drawString(
+        x,
+        y,
+        f"{'Volume':<21}{'Average Volume':<21}{'Market Cap':<21}{'Volatility':<21}",
+    )
+    y -= line_space
+
+    volatility_str = f"{volatility}% ({volatility_level.replace('_', ' ').title()})"
+    volume_row = f"{shorten_number(curr_volume):<21}{shorten_number(avg_volume):<21}{shorten_number(mkt_cap):<21}{volatility_str:<21}"
+    c.drawString(x, y, volume_row)
+    y -= line_space
+    c.drawString(x, y, divider)
+    y -= line_space
+
+    # Technical Analysis
+    c.drawString(x, y, f"{'TECHNICAL ANALYSIS':^84}")
+    y -= line_space
+    c.drawString(x, y, thin)
+    y -= line_space
+    c.drawString(x, y, f"{'50-Day MA':<21}{'200-Day MA':<21}{'Recent':<21}{'Next':<21}")
+    y -= line_space
+    MA_row = f"${fifty_MA:<20}${twoH_MA:<20}{recent.replace('_', ' ').title():<21}{next.replace('_', ' ').title():<21}"
+    c.drawString(x, y, MA_row)
+    y -= line_space
+    y -= line_space
+
+    trend_message = get_trend_message(trend)
+    trend_lines = wrap_text(trend_message)
+    c.drawString(x, y, f"Trend - {trend.replace('_', ' ').upper()}")
+    y -= line_space
+    for i in range(len(trend_lines)):
+        c.drawString(x, y, trend_lines[i])
+        y -= line_space
+    y -= line_space
+
+    momentum_message = get_momentum_message(momentum)
+    momentum_lines = wrap_text(momentum_message)
+    c.drawString(x, y, f"Momentum - {momentum.replace('_', ' ').upper()}")
+    y -= line_space
+    for i in range(len(momentum_lines)):
+        c.drawString(x, y, momentum_lines[i])
+        y -= line_space
+    y -= line_space
+
+    volume_message = get_volume_message(volume_confirmation)
+    volume_lines = wrap_text(volume_message)
+    c.drawString(x, y, f"Volume - {volume_confirmation.replace('_', ' ').upper()}")
+    y -= line_space
+    for i in range(len(volume_lines)):
+        c.drawString(x, y, volume_lines[i])
+        y -= line_space
+    c.drawString(x, y, divider)
+
+    # charts
+    y -= line_space
+    c.drawString(x, y, f"{'VISUAL CHARTS':^84}")
+    y -= line_space
+    c.drawString(x, y, thin)
+    y -= line_space
+    y -= 300
+    c.drawImage(f"{ticker}_charts.png", ((w - 500) // 2), y, width=500, height=300)
+    c.showPage()
+
+    # page 2
+    w, h = A4
+
+    side_margin = 72
+    top_margin = 72
+    x = side_margin
+    y = h - top_margin
+
+    fontsize = 9
+    line_space = fontsize * 1.3
+
+    c.setFont("Courier", fontsize)
+
+    width_chars = 84
+    divider = "=" * width_chars
+    thin = "-" * width_chars
+
+    # summary
+    c.drawString(x, y, divider)
+    y -= line_space
+    c.drawString(x, y, f"{'SUMMARY':^84}")
+    y -= line_space
+    c.drawString(x, y, thin)
+    y -= line_space
+    c.drawString(x, y, f"{'Signal Score':<13}: {score}/100")
+    y -= line_space
+    c.drawString(x, y, f"{'Outlook':<13}: {outlook.replace('_', ' ').title()}")
+    y -= line_space
+    c.drawString(x, y, f"{'Confidence':<13}: {confidence}")
+    y -= line_space
+    y -= line_space
+
+    summary_message = get_summary_message(score, outlook, confidence)
+    summary_lines = wrap_text(summary_message)
+    for line in summary_lines:
+        c.drawString(x, y, line)
+        y -= line_space
+    c.drawString(x, y, divider)
+
+    c.save()

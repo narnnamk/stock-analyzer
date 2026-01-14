@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from output import shorten_number
 
+plt.rcParams["font.family"] = "Courier"
+
 
 def get_x_ticks(days, dates):
     if days == 21:
@@ -103,7 +105,7 @@ def plot_volumes(ax, volumes, days, curr_vol, avg_vol, dates, colors):
         stats_text,
         transform=ax.transAxes,
         fontsize=9,
-        fontfamily="monospace",
+        fontfamily="courier",
         verticalalignment="top",
         horizontalalignment="left",
         bbox=dict(
@@ -122,7 +124,6 @@ def plot_volumes(ax, volumes, days, curr_vol, avg_vol, dates, colors):
 
 
 def plot_OBVs(ax, OBVs, days, dates):
-    print(f"days={days}, len(dates)={len(dates)}, len(OBVs)={len(OBVs)}")
     OBVs, full_sf = get_abbrv_sf(OBVs)
 
     ax.set_title("On-Balance Volume")
@@ -151,7 +152,7 @@ def plot_analyst_recommendations(ax, pct):
     ax.set_axisbelow(True)
 
     for i, v in enumerate(values):
-        ax.text((v - 9 if v >= 10 else v + 3), i - 0.06, f"{v}%", size=9)
+        ax.text((v - 9 if v >= 10 else v + 3), i - 0.05, f"{v}%", size=9)
 
 
 def plot_all_charts(
@@ -175,7 +176,5 @@ def plot_all_charts(
     plot_analyst_recommendations(axs[1, 0], pct)
     plot_OBVs(axs[1, 1], OBVs, days, dates)
 
-    fig.suptitle(f"{ticker} Charts", fontsize=14)
     plt.tight_layout()
-    plt.show()
-    # plt.savefig(f"{ticker}_charts.jpg", dpi=300, bbox_inches="tight")
+    plt.savefig(f"{ticker}_charts.png", dpi=300, bbox_inches="tight")

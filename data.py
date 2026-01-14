@@ -38,3 +38,7 @@ def get_recommendations(stock):
 def get_market_cap(stock):
     market_cap = stock.fast_info["marketCap"]
     return market_cap
+
+
+def get_company_name(stock):
+    return stock.info["displayName"]

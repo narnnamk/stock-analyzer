@@ -4,6 +4,7 @@ from plots import *
 from analysis import *
 from output import *
 from input import *
+import os
 
 print_welcome_message()
 
@@ -14,6 +15,8 @@ period = input_period(ticker)
 stock = yf.Ticker(ticker)
 
 history = stock.history(period="max")
+
+company_name = get_company_name(stock)
 
 days_in_period = {"1mo": 21, "3mo": 63, "6mo": 126, "1y": 252}
 days = days_in_period[period]
@@ -63,34 +66,6 @@ signal_score = get_signal_score(
 outlook = interpret_signal_score(signal_score)
 confidence_level = get_confidence(trend, momentum, volume_confirmation, recent_cross)
 
-print_quick_overview(
-    ticker,
-    period,
-    market_cap,
-    current_price,
-    usd_change,
-    percent_change,
-    current_volume,
-    avg_volume,
-    period_high,
-    period_low,
-    volatility,
-    volatility_level,
-)
-
-print_stock_analysis(
-    recent_cross,
-    next_cross,
-    fifty_MA,
-    two_hundred_MA,
-    trend,
-    momentum,
-    volume_confirmation,
-    recommendations_pct,
-    signal_score,
-    outlook,
-    confidence_level,
-)
 
 plot_all_charts(
     ticker,
@@ -107,11 +82,40 @@ plot_all_charts(
     recommendations_pct,
 )
 
+report = get_report(
+    ticker,
+    company_name,
+    period,
+    usd_change,
+    percent_change,
+    current_price,
+    period_high,
+    period_low,
+    volatility,
+    volatility_level,
+    current_volume,
+    avg_volume,
+    market_cap,
+    fifty_MA,
+    two_hundred_MA,
+    recent_cross,
+    next_cross,
+    trend,
+    momentum,
+    volume_confirmation,
+    signal_score,
+    outlook,
+    confidence_level,
+)
+
+os.remove(f"/Users/narnnamk/stock-analyzer/{ticker}_charts.png")
+
 # ---------------------------------------------------------------------------------------
 # variable.                 type        description
 # stock                     df          contains all yf library data about a stock given the ticker
 # ticker                    str         stock ticker
 # history                   df          history dataframe of the stock
+# company_name              str         company name
 # period                    str         user picked timeframe e.g. 1mo
 # days_in_period            dict        key value pair of days in each period e.g. 1mo:30
 # dates_in_period           list        list of all trading dates in the period
