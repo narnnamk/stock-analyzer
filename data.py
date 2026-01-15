@@ -1,7 +1,3 @@
-# import yfinance as yf
-# import pandas as pd
-
-
 def get_history_data(stock, history):
     return (
         round(stock.info["regularMarketPrice"], 2),

@@ -1,10 +1,8 @@
-# import pandas as pd
 import numpy as np
 import math
 
 
 def get_price_changes(current, closes, days):
-    # closing price at the beginning of the period
     start = closes.tail(days).iloc[0]
 
     usd_change = current - start

@@ -58,7 +58,7 @@ volatility_level = analyze_volatility(volatility, company_size)
 volume_confirmation = get_volume_confirmation(OBVs_list, close_prices, days)
 
 recent_cross = find_recent_cross(fifty_MAs_list, two_hundred_MAs_list)
-next_cross = predict_next_cross(fifty_MAs_list, two_hundred_MAs_list)
+next_cross = predict_next_cross(fifty_MAs_list, two_hundred_MAs_list, volatility_level)
 
 signal_score = get_signal_score(
     trend, momentum, volume_confirmation, recent_cross, next_cross
@@ -108,6 +108,7 @@ report = get_report(
     confidence_level,
 )
 
+# delete charts png
 os.remove(f"/Users/narnnamk/stock-analyzer/{ticker}_charts.png")
 
 # ---------------------------------------------------------------------------------------
@@ -150,3 +151,4 @@ os.remove(f"/Users/narnnamk/stock-analyzer/{ticker}_charts.png")
 # signal_score              int         return signal score out of 100
 # outlook                   str         return outlook direction according to signal score
 # confidence_level          str         return confidence level on signal scores
+# report                    pdf         report of stock analysis with text and charts
