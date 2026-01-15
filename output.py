@@ -3,26 +3,6 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
 
-# def print_welcome_message():
-#     width = 100
-#     print("\n")
-#     print("=" * width)
-#     print("Welcome to Stock Analyzer!")
-#     print("-" * width)
-#     print(
-#         "This program provides a technical analysis of a stock using price and volume data."
-#     )
-#     print(
-#         "It evaluates trend, momentum, volume confirmation, volatility, and MA crosses,"
-#     )
-#     print(
-#         "shows charts, and gives an overall score, outlook, and confidence at the end."
-#     )
-#     print("Note: 1mo = 21 trading days, 3mo = 63, 6mo = 126, and 1y = 252.")
-#     print("Get started by entering a stock ticker and a time period.")
-#     print("=" * width)
-
-
 def print_welcome_message():
     width = 100
     print()
