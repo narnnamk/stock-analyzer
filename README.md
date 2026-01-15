@@ -23,9 +23,10 @@ I have a strong interest in investing and I have had a brokerage account for alm
   - Final summary with signal score, outlook, and confidence
 
 ## Screenshots
-<img width="911" height="392" alt="Image" src="https://github.com/user-attachments/assets/75625571-5975-499f-91bc-cef1602ea9cd" />
-<img width="724" height="1024" alt="Image" src="https://github.com/user-attachments/assets/59b72df9-2f3e-498e-ac3b-b67ece4cfacb" />
-<img width="724" height="1024" alt="Image" src="https://github.com/user-attachments/assets/46aadc7c-7878-48e8-a7ec-722c56b3431e" />
+<img width="911" height="392" alt="Image" src="https://github.com/user-attachments/assets/e28a2958-69fa-4bb3-b008-381aef0132ae" />
+<img width="776" height="610" alt="Image" src="https://github.com/user-attachments/assets/8f6dc2a4-12f5-47f8-9f92-7cc0cc980f98" />
+<img width="837" height="573" alt="Image" src="https://github.com/user-attachments/assets/6115f526-f56c-47f1-a7bb-05bae580456c" />
+<img width="773" height="297" alt="Image" src="https://github.com/user-attachments/assets/593a418d-2e6a-4f7e-a0d9-cc71fdd15277" />
 
 ## Skills Demonstrated
 - Python (functions, modules, clean project structure)
