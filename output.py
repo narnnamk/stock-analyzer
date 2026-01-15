@@ -3,23 +3,40 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
 
+# def print_welcome_message():
+#     width = 100
+#     print("\n")
+#     print("=" * width)
+#     print("Welcome to Stock Analyzer!")
+#     print("-" * width)
+#     print(
+#         "This program provides a technical analysis of a stock using price and volume data."
+#     )
+#     print(
+#         "It evaluates trend, momentum, volume confirmation, volatility, and MA crosses,"
+#     )
+#     print(
+#         "shows charts, and gives an overall score, outlook, and confidence at the end."
+#     )
+#     print("Note: 1mo = 21 trading days, 3mo = 63, 6mo = 126, and 1y = 252.")
+#     print("Get started by entering a stock ticker and a time period.")
+#     print("=" * width)
+
+
 def print_welcome_message():
     width = 100
-    print("\n")
+    print()
     print("=" * width)
     print("Welcome to Stock Analyzer!")
     print("-" * width)
+    print("Enter a stock ticker and a time period to generate a stock analysis report.")
     print(
-        "This program provides a technical analysis of a stock using price and volume data."
+        "The report evaluates trend, momentum, volume confirmation, volatility, and MA crosses,"
     )
     print(
-        "It evaluates trend, momentum, volume confirmation, volatility, and MA crosses,"
-    )
-    print(
-        "shows charts, and gives an overall score, outlook, and confidence at the end."
+        "includes technical charts, and ends with a signal score, outlook, and confidence level."
     )
     print("Note: 1mo = 21 trading days, 3mo = 63, 6mo = 126, and 1y = 252.")
-    print("Get started by entering a stock ticker and a time period.")
     print("=" * width)
 
 
@@ -263,6 +280,174 @@ def wrap_text(text):
     return textwrap.wrap(text, width=84, break_long_words=False, break_on_hyphens=False)
 
 
+def print_header(c, x, y, divider, line_space, name, ticker, period):
+    c.drawString(x, y, divider)
+    y -= line_space
+    first_row = f"{name.upper()} STOCK ANALYSIS REPORT"
+    c.drawString(x, y, f"{first_row:^84}")
+    y -= line_space
+    ticker_row = f"Ticker: {ticker} | Period: {period}"
+    c.drawString(x, y, f"{ticker_row:^84}")
+    y -= line_space
+    c.drawString(x, y, divider)
+    y -= line_space
+
+    return x, y
+
+
+def print_overview(
+    c,
+    x,
+    y,
+    line_space,
+    thin,
+    usd_change,
+    pct_change,
+    price,
+    high,
+    low,
+    volatility,
+    volatility_level,
+    curr_volume,
+    avg_volume,
+    mkt_cap,
+    divider,
+):
+    c.drawString(x, y, f"{'QUICK OVERVIEW':^84}")
+    y -= line_space
+    c.drawString(x, y, thin)
+    y -= line_space
+
+    c.drawString(
+        x,
+        y,
+        f"{'Current Price':<21}{'Period High':<21}{'Period Low':<21}{'Price Change':<21}",
+    )
+    y -= line_space
+
+    change_str = f"{usd_change:+,.2f} ({pct_change:+.2f}%)"
+    price_row = f"${price:<20,.2f}${high:<20,.2f}${low:<20,.2f}{change_str:21}"
+    c.drawString(x, y, price_row)
+    y -= line_space
+    y -= line_space
+    c.drawString(
+        x,
+        y,
+        f"{'Volume':<21}{'Average Volume':<21}{'Market Cap':<21}{'Volatility':<21}",
+    )
+    y -= line_space
+
+    volatility_str = f"{volatility}% ({volatility_level.replace('_', ' ').title()})"
+    volume_row = f"{shorten_number(curr_volume):<21}{shorten_number(avg_volume):<21}{shorten_number(mkt_cap):<21}{volatility_str:<21}"
+    c.drawString(x, y, volume_row)
+    y -= line_space
+    c.drawString(x, y, divider)
+    y -= line_space
+
+    return x, y
+
+
+def print_technical(
+    c,
+    x,
+    y,
+    line_space,
+    thin,
+    fifty_MA,
+    twoH_MA,
+    recent,
+    next,
+    trend,
+    momentum,
+    volume_confirmation,
+    divider,
+):
+    c.drawString(x, y, f"{'TECHNICAL ANALYSIS':^84}")
+    y -= line_space
+    c.drawString(x, y, thin)
+    y -= line_space
+    c.drawString(x, y, f"{'50-Day MA':<21}{'200-Day MA':<21}{'Recent':<21}{'Next':<21}")
+    y -= line_space
+    MA_row = f"${fifty_MA:<20}${twoH_MA:<20}{recent.replace('_', ' ').title():<21}{next.replace('_', ' ').title():<21}"
+    c.drawString(x, y, MA_row)
+    y -= line_space
+    y -= line_space
+
+    trend_message = get_trend_message(trend)
+    trend_lines = wrap_text(trend_message)
+    c.drawString(x, y, f"Trend - {trend.replace('_', ' ').upper()}")
+    y -= line_space
+    for i in range(len(trend_lines)):
+        c.drawString(x, y, trend_lines[i])
+        y -= line_space
+    y -= line_space
+
+    momentum_message = get_momentum_message(momentum)
+    momentum_lines = wrap_text(momentum_message)
+    c.drawString(x, y, f"Momentum - {momentum.replace('_', ' ').upper()}")
+    y -= line_space
+    for i in range(len(momentum_lines)):
+        c.drawString(x, y, momentum_lines[i])
+        y -= line_space
+    y -= line_space
+
+    volume_message = get_volume_message(volume_confirmation)
+    volume_lines = wrap_text(volume_message)
+    c.drawString(x, y, f"Volume - {volume_confirmation.replace('_', ' ').upper()}")
+    y -= line_space
+    for i in range(len(volume_lines)):
+        c.drawString(x, y, volume_lines[i])
+        y -= line_space
+    c.drawString(x, y, divider)
+
+    return x, y
+
+
+def draw_charts(line_space, c, x, y, thin, ticker, w):
+    y -= line_space
+    c.drawString(x, y, f"{'VISUAL CHARTS':^84}")
+    y -= line_space
+    c.drawString(x, y, thin)
+    y -= line_space
+    y -= 300
+    c.drawImage(f"{ticker}_charts.png", ((w - 500) // 2), y, width=500, height=300)
+    c.showPage()
+
+    return x, y
+
+
+def print_summary(c, x, y, divider, line_space, thin, score, outlook, confidence):
+    c.drawString(x, y, divider)
+    y -= line_space
+    c.drawString(x, y, f"{'SUMMARY':^84}")
+    y -= line_space
+    c.drawString(x, y, thin)
+    y -= line_space
+    c.drawString(x, y, f"{'Signal Score':<13}: {score}/100")
+    y -= line_space
+    c.drawString(x, y, f"{'Outlook':<13}: {outlook.replace('_', ' ').title()}")
+    y -= line_space
+    c.drawString(x, y, f"{'Confidence':<13}: {confidence}")
+    y -= line_space
+    y -= line_space
+
+    summary_message = get_summary_message(score, outlook, confidence)
+    summary_lines = wrap_text(summary_message)
+    for line in summary_lines:
+        c.drawString(x, y, line)
+        y -= line_space
+    c.drawString(x, y, divider)
+
+    y -= line_space
+    disclaimer = "Note: This report is for educational purposes only and is not financial advice."
+    c.drawString(x, y, disclaimer)
+    y -= line_space
+    c.drawString(x, y, divider)
+    y -= line_space
+
+    return x, y
+
+
 def get_report(
     ticker,
     name,
@@ -306,97 +491,47 @@ def get_report(
     thin = "-" * width_chars
 
     # Header
-    c.drawString(x, y, divider)
-    y -= line_space
-    first_row = f"{name.upper()} STOCK ANALYSIS REPORT"
-    c.drawString(x, y, f"{first_row:^84}")
-    y -= line_space
-    ticker_row = f"Ticker: {ticker} | Period: {period}"
-    c.drawString(x, y, f"{ticker_row:^84}")
-    y -= line_space
-    c.drawString(x, y, divider)
-    y -= line_space
+    x, y = print_header(c, x, y, divider, line_space, name, ticker, period)
 
     # Quick Overview
-    c.drawString(x, y, f"{'QUICK OVERVIEW':^84}")
-    y -= line_space
-    c.drawString(x, y, thin)
-    y -= line_space
-
-    c.drawString(
+    x, y = print_overview(
+        c,
         x,
         y,
-        f"{'Current Price':<21}{'Period High':<21}{'Period Low':<21}{'Price Change':<21}",
+        line_space,
+        thin,
+        usd_change,
+        pct_change,
+        price,
+        high,
+        low,
+        volatility,
+        volatility_level,
+        curr_volume,
+        avg_volume,
+        mkt_cap,
+        divider,
     )
-    y -= line_space
-
-    change_str = f"{usd_change:+,.2f} ({pct_change:+.2f}%)"
-    price_row = f"${price:<20,.2f}${high:<20,.2f}${low:<20,.2f}{change_str:21}"
-    c.drawString(x, y, price_row)
-    y -= line_space
-    y -= line_space
-    c.drawString(
-        x,
-        y,
-        f"{'Volume':<21}{'Average Volume':<21}{'Market Cap':<21}{'Volatility':<21}",
-    )
-    y -= line_space
-
-    volatility_str = f"{volatility}% ({volatility_level.replace('_', ' ').title()})"
-    volume_row = f"{shorten_number(curr_volume):<21}{shorten_number(avg_volume):<21}{shorten_number(mkt_cap):<21}{volatility_str:<21}"
-    c.drawString(x, y, volume_row)
-    y -= line_space
-    c.drawString(x, y, divider)
-    y -= line_space
 
     # Technical Analysis
-    c.drawString(x, y, f"{'TECHNICAL ANALYSIS':^84}")
-    y -= line_space
-    c.drawString(x, y, thin)
-    y -= line_space
-    c.drawString(x, y, f"{'50-Day MA':<21}{'200-Day MA':<21}{'Recent':<21}{'Next':<21}")
-    y -= line_space
-    MA_row = f"${fifty_MA:<20}${twoH_MA:<20}{recent.replace('_', ' ').title():<21}{next.replace('_', ' ').title():<21}"
-    c.drawString(x, y, MA_row)
-    y -= line_space
-    y -= line_space
-
-    trend_message = get_trend_message(trend)
-    trend_lines = wrap_text(trend_message)
-    c.drawString(x, y, f"Trend - {trend.replace('_', ' ').upper()}")
-    y -= line_space
-    for i in range(len(trend_lines)):
-        c.drawString(x, y, trend_lines[i])
-        y -= line_space
-    y -= line_space
-
-    momentum_message = get_momentum_message(momentum)
-    momentum_lines = wrap_text(momentum_message)
-    c.drawString(x, y, f"Momentum - {momentum.replace('_', ' ').upper()}")
-    y -= line_space
-    for i in range(len(momentum_lines)):
-        c.drawString(x, y, momentum_lines[i])
-        y -= line_space
-    y -= line_space
-
-    volume_message = get_volume_message(volume_confirmation)
-    volume_lines = wrap_text(volume_message)
-    c.drawString(x, y, f"Volume - {volume_confirmation.replace('_', ' ').upper()}")
-    y -= line_space
-    for i in range(len(volume_lines)):
-        c.drawString(x, y, volume_lines[i])
-        y -= line_space
-    c.drawString(x, y, divider)
+    x, y = print_technical(
+        c,
+        x,
+        y,
+        line_space,
+        thin,
+        fifty_MA,
+        twoH_MA,
+        recent,
+        next,
+        trend,
+        momentum,
+        volume_confirmation,
+        divider,
+    )
 
     # charts
-    y -= line_space
-    c.drawString(x, y, f"{'VISUAL CHARTS':^84}")
-    y -= line_space
-    c.drawString(x, y, thin)
-    y -= line_space
-    y -= 300
-    c.drawImage(f"{ticker}_charts.png", ((w - 500) // 2), y, width=500, height=300)
-    c.showPage()
+    x, y = draw_charts(line_space, c, x, y, thin, ticker, w)
 
     # page 2
     w, h = A4
@@ -416,25 +551,6 @@ def get_report(
     thin = "-" * width_chars
 
     # summary
-    c.drawString(x, y, divider)
-    y -= line_space
-    c.drawString(x, y, f"{'SUMMARY':^84}")
-    y -= line_space
-    c.drawString(x, y, thin)
-    y -= line_space
-    c.drawString(x, y, f"{'Signal Score':<13}: {score}/100")
-    y -= line_space
-    c.drawString(x, y, f"{'Outlook':<13}: {outlook.replace('_', ' ').title()}")
-    y -= line_space
-    c.drawString(x, y, f"{'Confidence':<13}: {confidence}")
-    y -= line_space
-    y -= line_space
-
-    summary_message = get_summary_message(score, outlook, confidence)
-    summary_lines = wrap_text(summary_message)
-    for line in summary_lines:
-        c.drawString(x, y, line)
-        y -= line_space
-    c.drawString(x, y, divider)
+    x, y = print_summary(c, x, y, divider, line_space, thin, score, outlook, confidence)
 
     c.save()
