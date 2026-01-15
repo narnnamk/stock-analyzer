@@ -82,7 +82,7 @@ plot_all_charts(
     recommendations_pct,
 )
 
-report = get_report(
+get_report(
     ticker,
     company_name,
     period,
@@ -108,47 +108,63 @@ report = get_report(
     confidence_level,
 )
 
-# delete charts png
 os.remove(f"/Users/narnnamk/stock-analyzer/{ticker}_charts.png")
+print(
+    f"{ticker} stock analysis report was generated and saved as '{ticker}_Report.pdf' in this directory."
+)
+print("=" * 100)
 
 # ---------------------------------------------------------------------------------------
-# variable.                 type        description
-# stock                     df          contains all yf library data about a stock given the ticker
-# ticker                    str         stock ticker
-# history                   df          history dataframe of the stock
-# company_name              str         company name
-# period                    str         user picked timeframe e.g. 1mo
-# days_in_period            dict        key value pair of days in each period e.g. 1mo:30
-# dates_in_period           list        list of all trading dates in the period
-# current_price             flt         current stock market value
-# open_prices               df_col      historical open prices of stock
-# close_prices              df_col      historical close prices of stock
-# volumes                   df_col      historical volumes of the stock
-# usd_change                flt         price changes of the stock from period begin to now
-# percent_change            pct         percentage changes of the stock prices from begin to now
-# volatility                pct         n-day volatility of the stock price in percentage
-# fifty_MA                  flt         current 50-Day MA
-# fifty_MAs_list            list        list of 50-day MAs of the days in period
-# two_hundred_MA            flt         current 200-Day MA
-# two_hundred_MAs_list      list        list of 200-day MAs of the days in period
-# current_volume            int         latest volume
-# avg_volume                int         average volume over the period
-# current_OBV               int         current on balance volume
-# OBVs_list                 list        list of on balance volume of the days in period
-# volume_colors             list        list of colors according to closing price compared to previous days.
-# period_high               flt         highest stock price from the period
-# period_low                flt         lowest stock price from the period
-# recommendations           dict        dictionary containing expert/financial firms recommendations with keys: strongBuy, buy, hold, sell, strongSell
-# recommendations_pct       list        return buy, hold, sell in percent according to recommendations
-# trend                     dict key    dictionary key to access trend message with the get_trend_message() function
-# momentum                  dict key    dictionary key to access momentum message with the get_momentum_message() function
-# market_cap                int         stock's market cap in usd
-# company_size              dict key    company size in according to market cap
-# volatility_description    dict key    annualized volatility according to company size
-# volume_confirmation       str         confirm trend using OBV
-# recent_cross              str         the most recent cross
-# next_cross                str         prediction of the next cross
-# signal_score              int         return signal score out of 100
-# outlook                   str         return outlook direction according to signal score
-# confidence_level          str         return confidence level on signal scores
-# report                    pdf         report of stock analysis with text and charts
+# variable                 type                 description
+# stock                    yf.Ticker            yfinance Ticker object for the symbol (used to fetch data)
+# ticker                   str                  stock ticker symbol (e.g., "TSLA")
+# history                  pd.DataFrame         historical OHLCV dataframe for the selected period
+# company_name             str                  company name
+
+# period                   str                  selected timeframe: "1mo", "3mo", "6mo", "1y"
+# days_in_period           dict[str, int]       map of period -> trading days used in your logic (1mo:21, 3mo:63, 6mo:126, 1y:252)
+# dates_in_period          list[str]            trading dates in the period as "YYYY-MM-DD" (aligned to your plotted data)
+
+# current_price            float                latest close price used in the summary
+# open_prices              pd.Series            historical open prices (aligned to history index)
+# close_prices             pd.Series            historical close prices (aligned to history index)
+# volumes                  pd.Series            historical volume values (aligned to history index)
+
+# usd_change               float                price change from period start to latest (USD)
+# percent_change           float                percent change from period start to latest (e.g., 4.18 means 4.18%)
+# volatility               float                annualized volatility in percent (e.g., 43.12 means 43.12%)
+
+# fifty_MA                 float                latest 50-day moving average value
+# fifty_MAs_list           list[float]          50-day MA values across the selected period (aligned to dates_in_period)
+# two_hundred_MA           float                latest 200-day moving average value
+# two_hundred_MAs_list     list[float]          200-day MA values across the selected period (aligned to dates_in_period)
+
+# current_volume           int                  latest trading day volume
+# avg_volume               float                average volume over the selected period
+# current_OBV              float                latest On-Balance Volume value (can be negative)
+# OBVs_list                list[float]          OBV values across the selected period (aligned to dates_in_period)
+# volume_colors            list[str]            color label per day based on close vs previous close (e.g., "green"/"red")
+
+# period_high              float                highest price in the selected period
+# period_low               float                lowest price in the selected period
+
+# recommendations          dict[str, int]       analyst rating counts from yfinance: strongBuy, buy, hold, sell, strongSell
+# recommendations_pct      dict[str, float]     buy/hold/sell distribution in percent: {"buy": x, "hold": y, "sell": z}
+
+# trend                    str                  trend key from analyze_trend() (e.g., "strong_bullish")
+# momentum                 str                  momentum key from analyze_momentum() (e.g., "mixed_signal")
+
+# market_cap               int                  market capitalization in USD
+# company_size             str                  company size label derived from market cap (e.g., "mega_cap", "large_cap", etc.)
+# volatility_description   str                  volatility level key from analyze_volatility() (e.g., "very_high")
+
+# volume_confirmation      str                  volume/OBV confirmation key (e.g., "bullish_confirm", "consolidation")
+# recent_cross             str                  most recent MA cross key (e.g., "golden_cross", "no_cross")
+# next_cross               str                  predicted next MA cross key (e.g., "possible_death_cross", "no_upcoming_cross")
+
+# signal_score             int                  overall signal score (0–100)
+# outlook                  str                  outlook key derived from signal score (e.g., "bullish")
+# confidence_level         str                  confidence label ("High", "Moderate", "Low")
+
+# report_path              str                  generated PDF output file path (e.g., "TSLA_Report.pdf")
+# ---------------------------------------------------------------------------------------
