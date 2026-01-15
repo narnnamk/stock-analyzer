@@ -145,15 +145,35 @@ def find_recent_cross(fifty_MAs, two_hundred_MAs):
     return "no_cross"
 
 
-def predict_next_cross(fifty_MAs, two_hundred_MAs):
+def predict_next_cross(fifty_MAs, two_hundred_MAs, volatility_level):
     prev_gap = fifty_MAs[-2] - two_hundred_MAs[-2]
     curr_gap = fifty_MAs[-1] - two_hundred_MAs[-1]
 
+    volatility_threshold = {
+        "very_high": 0.15,
+        "high": 0.10,
+        "moderate": 0.05,
+        "low": 0.03,
+        "very_low": 0.015,
+    }
+    gap_threshold = volatility_threshold[volatility_level]
+    gap_pct = abs(curr_gap) / max(fifty_MAs[-1], two_hundred_MAs[-1])
+
     if abs(curr_gap) < abs(prev_gap):
-        if prev_gap > 0 and curr_gap > 0 and curr_gap < prev_gap:
+        if (
+            prev_gap > 0
+            and curr_gap > 0
+            and curr_gap < prev_gap
+            and gap_pct <= gap_threshold
+        ):
             return "possible_death_cross"
 
-        if prev_gap < 0 and curr_gap < 0 and curr_gap > prev_gap:
+        if (
+            prev_gap < 0
+            and curr_gap < 0
+            and curr_gap > prev_gap
+            and gap_pct <= gap_threshold
+        ):
             return "possible_golden_cross"
 
     return "no_upcoming_cross"
